@@ -9,6 +9,7 @@ var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
 
+
 // =============== Global var
 var mongoClient = mongo.MongoClient;
 
@@ -71,6 +72,24 @@ mongoClient.connect(dbUrl, function(err, db) {
                 }
             });
         });
+        
+        // Find Topic by ID 
+        db.collection(tbTopic, function(err,collection,topicId){
+            var cursorTopic = collection.find({_id : ObjectId(topicId)});
+            console.log("===== Find topic  by id and return only one document =====");
+            
+        });
+        
+        // Find Idea By ID 
+        db.collection(tbIdea,function(err,collection,ideaId){
+           var cursorIdea = collection.find({_id : ObjectId(ideaId)});
+           console.log("===== Find idea  by id and return only one document =====");
+        });
+        
+        
+        
+        
+        
                     
     } else {
         console.log("[ERROR] : Can not connect DB. dbUrl = " + dbUrl);
