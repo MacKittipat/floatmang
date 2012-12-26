@@ -3,7 +3,8 @@ var ejs = require('ejs');
 var socketio = require('socket.io');
 var mongodb = require('mongodb');
 var clientSessions = require('client-sessions');
-var routes = require('./routes')
+var routes = require('./routes');
+var listideas = require('./routes/listidea');
 
 // =============== Config
 var appHost = '127.0.0.1';
@@ -25,21 +26,9 @@ app.use(clientSessions({
                        duration: 24 * 60 * 60 * 1000 // defaults to 1 day
                        }));
 
-app.get('/', function(req, res) {
-        res.render('login', {
-                   data: {
-                   message: 'hello from node'
-                   }
-                   });
-        });
+app.get('/', routes.login);
 
-app.get('/info', function(req, res) {
-        res.render('info', {
-                   data: {
-                   message: 'hello from node'
-                   }
-                   });
-        });
+app.get('/listideas', listideas.list);
 
 var listen =  app.listen(appPort);
 console.log('App is running : http://localhost:' + appPort);
