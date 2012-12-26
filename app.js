@@ -2,9 +2,7 @@ var express = require('express');
 var ejs = require('ejs');
 var socketio = require('socket.io');
 var mongodb = require('mongodb');
-var clientSessions = require('client-sessions');
 var routes = require('./routes');
-var listideas = require('./routes/listidea');
 
 // =============== Config
 var appHost = '127.0.0.1';
@@ -16,19 +14,10 @@ app.engine('html', ejs.__express); // Use ejs template engine.
 app.set('views', __dirname + '/view'); // Set view dir.
 app.set('view engine', 'html'); // Set view extension.
 app.use(express.static(__dirname + '/resource/js')); // Import all static file in /resource/js.
-app.use(clientSessions({
-                       cookieName: 'session_state',    // defaults to session_state
-                       secret: 'blargadeeblargblarg', // MUST be set
-                       // true session duration:
-                       // will expire after duration (ms)
-                       // from last session.reset() or
-                       // initial cookieing.
-                       duration: 24 * 60 * 60 * 1000 // defaults to 1 day
-                       }));
 
+// =============== Web App Route
 app.get('/', routes.login);
-
-app.get('/listideas', listideas.list);
+app.get('/topic', routes.topic);
 
 var listen =  app.listen(appPort);
 console.log('App is running : http://localhost:' + appPort);
