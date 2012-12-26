@@ -1,0 +1,8 @@
+{
+    "name": "floatmangdb",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "mongodb": "1.2.7"
+    }
+}
