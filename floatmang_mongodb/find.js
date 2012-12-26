@@ -49,6 +49,28 @@ mongoClient.connect(dbUrl, function(err, db) {
                 }
             });
         });
+        
+        // Find comment by like and commentby with skip and limit.
+        db.collection(tbComment, function(err, collection) {            
+            var cursorComment = collection.find({}, {sort:{like:-1, createtime:-1}, skip:10, limit:6});
+            cursorComment.toArray(function(err, documents) {
+                console.log("===== Find comment by like and commentby with skip and limit. =====");
+                for(var key in documents) {
+                    console.log(documents[key].comment + " | " + documents[key].commentby + " | " + documents[key].commenttime + " | " + documents[key].like);
+                }
+            });
+        });
+        
+        // Find comment by like and commentby with skip and limit 2.
+        db.collection(tbComment, function(err, collection) {            
+            var cursorComment = collection.find({}, {sort:{like:-1, createtime:-1}, skip:10, limit:6});
+            cursorComment.each(function(err, documents) {
+                console.log("===== Find comment by like and commentby with skip and limit 2. =====");
+                for(var key in documents) {
+                    console.log(key + " = " + documents[key]);
+                }
+            });
+        });
                     
     } else {
         console.log("[ERROR] : Can not connect DB. dbUrl = " + dbUrl);
