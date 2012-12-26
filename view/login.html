@@ -1,17 +1,25 @@
+<!DOCTYPE html>
 <html>
     <head>
-        <title>Float Mang!!!</title>
+        <title>FloatMang</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+            });
+        </script>
     </head>
-    <body>
-        <div id=container>
-            Float mang!!!
+    <body>        
+        <form method="post">
             <div>
-                Your name :
-                <input type='text' name = 'name'/>
+                <input type="text" name="name" />
             </div>
             <div>
-                <a target="_parent" href="/listideas">link</a>
+                <input id="anonymous" name="anonymous" type="checkbox" /> <label for="anonymous">Anonymous</label>.
             </div>
-        </div>
+            <input type="submit" value="Login" />
+        </form>
     </body>
 </html>
