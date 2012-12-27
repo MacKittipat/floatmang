@@ -293,6 +293,26 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });
+    
+    socket.on('saveNewIdea', function(data) {
+    	console.log("saving new idea : "+ data.newIdea);
+    	console.log("topic id : "+data.topicId);
+    	mongoClient.connect(dbUrl, function(err, db) { 
+    		db.collection(tbIdea, function( err, collection) {
+    			//add new idea base on topic
+    			collection.insert({
+    				idea: data.newIdea,
+    				createby : data.name,
+    				createtime:new Date().getTime(),
+    				topic_id:data.topicId
+    			}, {w:-1}, function(err, document) {
+    				console.log("updaing client");
+    				socket.emit('servreSaveNewIdea',{ideaId: document[0]._id, newIdea: data.newIdea});
+    				socket.broadcast.emit('servreSaveNewIdea',{ideaId: document[0]._id, newIdea: data.newIdea});
+    			});
+    		})
+    	});
+    });
 });
 
 // =============== Utility Function

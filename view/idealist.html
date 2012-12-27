@@ -4,6 +4,7 @@
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
@@ -17,6 +18,9 @@
                 $("#idea" + data.ideaId).html(data.idea); 
                 $("#frmEditIdea #ideaId").val("");
                 $("#frmEditIdea #idea").val("");
+            });
+            socket.on('servreSaveNewIdea', function(data) {
+            	$("#ideaTemplate").tmpl({ideaId:data.topicId, newIdea:data.newIdea}).prependTo("#boxIdea");
             });
             function like(ideaId) {
                 socket.emit('clientLikeIdea', {
@@ -60,11 +64,13 @@
                     }); 
                 });
                 $("#savenewidea").click(function() {
-                    $ajax({
-                        url: "http://localhost:8888/newidea",
-                        type: "post", 
-                        data: $("#newtopicform").serialize()
-                    })
+                	var topicId = $("#topicId").val();
+                	var newIdea = $("#newidea").val();  
+                    socket.emit('saveNewIdea' , {
+                    	topicId : topicId,
+                    	newIdea: newIdea,
+                    	name: 'name'
+                    });
                 });
             });
         </script>
@@ -79,6 +85,7 @@
                 <form id="newideaform">
                     <div>
                         <input type="text" id="newidea" value="" placeholder="put your idea"/>
+                        <input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
                         <input type="button" id=savenewidea value="put idea" />
                     </div>
                 </form>
@@ -115,6 +122,27 @@
 
                 <% } %>
             </div>
+            
+            <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
+                <div>
+                    <span id="idea${ideaId}">
+                        ${newIdea}
+                    </span>
+                    &nbsp;&nbsp;
+                    <span>                           
+                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like ('0')</a>
+                    </span>
+                    <span>                           
+                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate ('0')</a>
+                    </span>
+                    <span>
+                        <a onclick="edit('${ideaId}');" href="javascript:void(0);">
+                            Edit
+                        </a>
+                    </span>
+                </div>
+            </script>
+            
             <% if(totalIdea > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">

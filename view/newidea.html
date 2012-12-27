@@ -9,7 +9,7 @@
 			//alert("ready");
 		});	
 		$(function() {
-			$('#savetopic').click(function() {
+			$("#savenewidea").click(function() {
 				$.ajax({
 					url: "http://localhost:8888/newidea",
 					type: "post", 
@@ -23,10 +23,12 @@
 	Create new idea
 	<form method="post" id="newideaform">
 		<div>
-			<label>Your topic</label>
- 			<input type="text" name="idea" id="idea" />
-      	</div>
-            <input type="button" id="saveidea" value="Save" />
+        		New idea
+                    <div>
+                        <input type="text" id="newidea" value="" placeholder="put your idea"/>
+                        <input type="button" id=savenewidea value="put idea" />
+                    </div>
+            </div>
 	</form>	
 </body>
 </html>
