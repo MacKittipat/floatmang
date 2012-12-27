@@ -235,9 +235,7 @@ body {
 }
 
 a {
-  color: #005580;
- /* color: #0076b1;*/
-
+  color: #0088cc;
   text-decoration: none;
 }
 
@@ -269,8 +267,8 @@ a:hover {
 }
 
 .row {
-  /*margin-left: -20px;*/
-  margin-left: 0px !important;
+  margin-left: -20px;
+  /*margin-left: 0px !important;*/
   margin-top: 15px;
   *zoom: 1;  
 }
