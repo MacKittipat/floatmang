@@ -10,16 +10,27 @@
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
                 $("#frmAddTopic #topic").val("");
-//                $("#boxTopic").prepend("<div><a>" + data.topic + "</a></div>");
                 $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic}).prependTo("#boxTopic");
             });
+            socket.on('serverUpdateEditTopic', function(data) {
+                console.log(data.topicId + " | " + data.topic);
+                $("#topic" + data.topicId).html(data.topic); 
+                $("#frmEditTopic #topicId").val("");
+                $("#frmEditTopic #topic").val("");
+            });
+            function edit(topicId) {
+                $("#frmEditTopic #topicId").val(topicId);
+                $.post('/a/gettopic', {topicId:topicId}, function(data) {
+                    console.log(data.topic);
+                    $("#frmEditTopic #topic").val(data.topic);
+                }, 'json');
+            }
             $(document).ready(function() {
                 $("#btnShowMore").click(function() {
                     var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
                     $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
                         for(var key in data) {
                             $("#topicTemplate").tmpl({topicId:data[key]._id, topic:data[key].topic}).appendTo("#boxTopic");
-//                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
                         }
                         $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
                     }, 'json');
@@ -32,6 +43,17 @@
                     }
                     socket.emit('clientAddTopic', {
                         name: name, 
+                        topic: topic
+                    }); 
+                });
+                $("#frmEditTopic").submit(function() {
+                    var topicId = $.trim($("#frmEditTopic #topicId").val());
+                    var topic = $.trim($("#frmEditTopic #topic").val());
+                    if(!topicId || !topic) {
+                        return;
+                    }
+                    socket.emit('clientEditTopic', {
+                        topicId: topicId, 
                         topic: topic
                     }); 
                 });
@@ -53,15 +75,25 @@
                     </div>
                 </form>
             </div>
+            <div>
+                <h3>Edit Topic</h3>
+                <form id="frmEditTopic" onsubmit="return false;">
+                    <div>
+                        <input type="hidden" id="topicId" value="" />
+                        <input type="text" id="topic" value="" />
+                        <input type="submit" value="Save" />
+                    </div>
+                </form>
+            </div>
             <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
             <div id="boxTopic">
                 <% for(var key in documents) {%>
                 <div>
-                    <a href="/idea/list/?id=<%= documents[key]._id %>">
+                    <a id="topic<%= documents[key]._id %>" href="/idea/list/?id=<%= documents[key]._id %>">
                         <%= documents[key].topic  %>
                     </a>
                     &nbsp;&nbsp;
-                    <a href="/topic/edit/?id=<%= documents[key]._id %>">
+                    <a onclick="edit('<%= documents[key]._id  %>');" href="javascript:void(0);">
                         Edit
                     </a>
                 </div>
@@ -69,11 +101,11 @@
             </div>
             <script id="topicTemplate" type="text/x-jquery-tmpl"> 
                 <div>
-                    <a href="/idea/list/?id=${topicId}">
+                    <a id="topic${topicId}" href="/idea/list/?id=${topicId}">
                         ${topic}
                     </a>
                     &nbsp;&nbsp;
-                    <a href="/topic/edit/?id=${topicId}">
+                    <a onclick="edit('${topicId}');" href="javascript:void(0);">
                         Edit
                     </a>
                 </div>

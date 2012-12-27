@@ -57,6 +57,7 @@ app.post('/login', function(req, res) {
         // Get post parameter 'name' and set session.
         req.session.name = req.body.name; 
     }
+    console.log("[DEBUG] session 'name' : " + req.session.name);
     res.redirect('topic');
 });
 
@@ -64,7 +65,6 @@ app.get('/logout', function(req, res) {
     req.session.destroy();
     res.redirect('login');
 });
-
 
 app.get('/topic', function(req, res) {
     if(loggedIn(req)) {
@@ -91,47 +91,6 @@ app.get('/topic', function(req, res) {
     } else {
         res.redirect('/');
     }
-});
-
-///Show Topic To Edit
-app.get('/topic/edit',function(req,res){
-  
-    //req.boby.id
-     if(loggedIn(req)){
-          //Display Topic To Edit
-          mongoClient.connect(dbUrl,function(err,db){
-              db.collection(tbTopic,function(err,collection){
-                   var obj_id = BSON.ObjectID.createFromHexString(req.query.id);
-                //  var cursorTopic = collection.find({_id : obj_id});
-                      collection.findOne({_id : obj_id}, function(err, documents) {
-                      console.log(req.query.id)
-                       res.render('editTopic',{
-                           documents:documents 
-                       });
-                  });
-              })
-          })
-     }
-})
-
-//Update Edit Topic
-app.post('/updatetopic', function(req, res) {
-       
-        var editTopic = req.body.edittopic;
-        var createBy = req.session.name;
-        console.log("edittopic : "+ editTopic);
-        console.log("createBy : " + createBy);
-    
-        // insert data
-        mongoClient.connect(dbUrl, function(err, db) {
-                db.collection(tbTopic, function(err, collection) {
-                        collection.insert({
-                                topic: newTopic,
-                                createby: username,
-                                createtime:new Date().getTime()
-                        }, {w:-1});
-                });
-        });
 });
 
 // Idea in list mode.
@@ -204,24 +163,28 @@ app.post('/a/moreidea', function(req, res) {
     });
 });
 
-app.post('/a/getidea', function(req, res) {
+app.post('/a/gettopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
-        db.collection(tbIdea, function(err, collection) {
-            // Find idea by idea.
-            collection.findOne({_id:new ObjectID(req.body.ideaId)}, function(err, document) {
-                // Return idea as JSON. 
+        db.collection(tbTopic, function(err, collection) {
+            // Find topic by topicId.
+            collection.findOne({_id:new ObjectID(req.body.topicId)}, function(err, document) {
+                // Return topic as JSON. 
                 res.json(document);  
             }); 
         });
     });
 });
 
-app.get('/test', function(req, res) {
-    res.render('test');
-});
-
-app.get('/json', function(req, res) {
-    res.json({a:1});
+app.post('/a/getidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea by ideaId.
+            collection.findOne({_id:new ObjectID(req.body.ideaId)}, function(err, document) {
+                // Return idea as JSON. 
+                res.json(document);  
+            }); 
+        });
+    });
 });
 
 console.log('App is running : http://localhost:' + appPort);
@@ -262,11 +225,24 @@ io.sockets.on('connection', function (socket) {
         });
     });   
     
+    socket.on('clientEditTopic', function (data) {
+        console.log("[DEBUG] clientEditTopic, topic id : " + data.topicId + " | " + data.topic);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbTopic, function(err, collection) {
+                // Edit topic
+                collection.update({_id:new ObjectID(data.topicId)}, {$set:{topic:data.topic}}, {w:-1});
+                // Update client.
+                socket.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
+                socket.broadcast.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
+            });
+        });
+    });
+    
     socket.on('clientEditIdea', function (data) {
         console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId);
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbIdea, function(err, collection) {
-                // Find idea by idea.
+                // Edit idea.
                 collection.update({_id:new ObjectID(data.ideaId)}, {$set:{idea:data.idea}}, {w:-1});
                 // Update client.
                 socket.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
