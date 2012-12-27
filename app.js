@@ -163,11 +163,38 @@ app.post('/a/moretopic', function(req, res) {
 app.post('/a/moreidea', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbIdea, function(err, collection) {
-            // Find idea.
+            // Find idea by topic id.
             var cursorIdea = collection.find({topic_id:new ObjectID(req.body.topicId)}, {sort:{like:-1, createtime:-1}, skip:req.body.totalDisplayIdea, limit:limit}); 
             cursorIdea.toArray(function(err, documents) { 
                 // Return idea as JSON. 
                 res.json(documents);   
+            });
+        });
+    });
+});
+
+app.post('/a/getidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea by idea.
+            collection.findOne({_id:new ObjectID(req.body.ideaId)}, function(err, document) {
+                // Return idea as JSON. 
+                res.json(document);  
+            }); 
+        });
+    });
+})
+
+app.post('/a/updateidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea by idea.
+            collection.update({_id:new ObjectID(req.body.ideaId)}, {$set:{idea:req.body.idea}}, {w:-1});
+            // Update client.
+            io.sockets.on('connection', function (socket) {
+                console.log("1 : " + req.body.ideaId + " " + req.body.idea);
+                socket.emit('serverUpdateEditIdea', {ideaId:req.body.ideaId, idea:req.body.idea});
+                socket.broadcast.emit('serverUpdateEditIdea', {ideaId:req.body.ideaId, idea:req.body.idea});
             });
         });
     });
@@ -218,6 +245,19 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });   
+    
+    socket.on('clientEditIdea', function (data) {
+        console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by idea.
+                collection.update({_id:new ObjectID(data.ideaId)}, {$set:{idea:data.idea}}, {w:-1});
+                // Update client.
+                socket.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
+                socket.broadcast.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
+            });
+        });
+    });
 });
 
 // =============== Utility Function

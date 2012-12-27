@@ -10,11 +10,6 @@
                 $("#btnShowMore").click(function() {
                     var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
                     $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
-//                        if(totalDisplayTopic < <%= totalTopic  %>) {
-//                            $("#btnShowMore").show();
-//                        } else {
-//                            $("#btnShowMore").hide();
-//                        }
                         for(var key in data) {
                             $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
                         }

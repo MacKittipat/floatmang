@@ -13,6 +13,11 @@
             socket.on('serverUpdateDislike', function(data) {
                 $("#btnDislike" + data.ideaId).html("Hate (" + data.dislike + ")");
             });
+            socket.on('serverUpdateEditIdea', function(data) {
+                $("#idea" + data.ideaId).html(data.idea); 
+                $("#frmEditIdea #ideaId").val("");
+                $("#frmEditIdea #idea").val("");
+            });
             function like(ideaId) {
                 socket.emit('clientLikeIdea', {
                     ideaId: ideaId
@@ -23,24 +28,37 @@
                     ideaId: ideaId
                 }); 
             }
+            function edit(ideaId) {
+                $("#frmEditIdea #ideaId").val(ideaId);
+                $.post('/a/getidea', {ideaId:ideaId}, function(data) {
+                    $("#frmEditIdea #idea").val(data.idea);
+                }, 'json');
+            }
             $(document).ready(function() {
                 $("#btnShowMore").click(function() {
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
-//                        if(totalDisplayTopic < <%= totalIdea  %>) {
-//                            $("#btnShowMore").show();
-//                        } else {
-//                            $("#btnShowMore").hide();
-//                        }
                         for(var key in data) {
-                            $("#boxIdea").append("<div>" + data[key].idea + "&nbsp;&nbsp;" +
-                            "<span><a id='btnLike" + data[key]._id + "' onclick='like(\'" + data[key]._id +"\');' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
-                            "<span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\'" + data[key]._id +"\');' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
+                            $("#boxIdea").append("<div><span id='idea" + data[key]._id + "'>" + data[key].idea + "</span>&nbsp;&nbsp;" +
+                            " <span><a id='btnLike" + data[key]._id + "' onclick='like(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
+                            " <span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
+                            " <span><a onclick='edit(\"" + data[key]._id + "\");' href='javascript:void(0);'>Edit</a></span>" + 
                             "</div>");
                         }
                         $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
                     }, 'json');
-                });                
+                });         
+                $("#frmEditIdea").submit(function() {
+                    var ideaId = $.trim($("#frmEditIdea #ideaId").val());
+                    var idea = $.trim($("#frmEditIdea #idea").val());
+                    if(!ideaId || !idea) {
+                        return;
+                    }
+                    socket.emit('clientEditIdea', {
+                        ideaId: ideaId, 
+                        idea: idea
+                    }); 
+                });
             });
         </script>
     </head>
@@ -50,8 +68,9 @@
         </h2>
         <div>
             <div>
-                <form id="frmEditIdea">
+                <form id="frmEditIdea" onsubmit="return false;">
                     <div>
+                        <input type="hidden" id="ideaId" value="" />
                         <input type="text" id="idea" value="" />
                         <input type="submit" value="Save" />
                     </div>
@@ -61,13 +80,20 @@
             <div id="boxIdea">
                 <% for(var key in documents) {%>
                 <div>
-                    <%= documents[key].idea  %>
+                    <span id="idea<%= documents[key]._id  %>">
+                        <%= documents[key].idea  %>
+                    </span>
                     &nbsp;&nbsp;
                     <span>                           
-                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like  %>)</a>
+                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like %>)</a>
                     </span>
                     <span>                           
-                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
+                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike %>)</a>
+                    </span>
+                    <span>
+                        <a onclick="edit('<%= documents[key]._id  %>');" href="javascript:void(0);">
+                            Edit
+                        </a>
                     </span>
                 </div>            
                 <% } %>
