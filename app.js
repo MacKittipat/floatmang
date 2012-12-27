@@ -16,8 +16,7 @@ var tbIdea = "idea";
 var tbComment = "comment";
 var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
-var limit = 3;
-
+var limit = 10;
 
 // =============== Web App Global Var 
 var app = express();
@@ -26,7 +25,6 @@ var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
 var BSON = require('mongodb').BSONPure;
-
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -83,7 +81,8 @@ app.get('/topic', function(req, res) {
                             totalTopic:count,
                             appHost:appHost,
                             appPort:appPort,
-                            limit:limit
+                            limit:limit,
+                            name:req.session.name
                         });
                     });
                 });
@@ -135,16 +134,6 @@ app.post('/updatetopic', function(req, res) {
         });
 });
 
-
-
-
-
-
-
-
-
-
-
 // Idea in list mode.
 app.get('/idea/list', function(req, res) {
     if(loggedIn(req)) {
@@ -161,7 +150,8 @@ app.get('/idea/list', function(req, res) {
                             topicId:req.query.id,
                             appHost:appHost,
                             appPort:appPort,
-                            limit:limit
+                            limit:limit,
+                            name:req.session.name
                         });
                     });
                });
@@ -250,21 +240,6 @@ app.post('/a/getidea', function(req, res) {
             }); 
         });
     });
-})
-
-app.post('/a/updateidea', function(req, res) {
-    mongoClient.connect(dbUrl, function(err, db) { 
-        db.collection(tbIdea, function(err, collection) {
-            // Find idea by idea.
-            collection.update({_id:new ObjectID(req.body.ideaId)}, {$set:{idea:req.body.idea}}, {w:-1});
-            // Update client.
-            io.sockets.on('connection', function (socket) {
-                console.log("1 : " + req.body.ideaId + " " + req.body.idea);
-                socket.emit('serverUpdateEditIdea', {ideaId:req.body.ideaId, idea:req.body.idea});
-                socket.broadcast.emit('serverUpdateEditIdea', {ideaId:req.body.ideaId, idea:req.body.idea});
-            });
-        });
-    });
 });
 
 app.get('/test', function(req, res) {
@@ -322,6 +297,25 @@ io.sockets.on('connection', function (socket) {
                 // Update client.
                 socket.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
                 socket.broadcast.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
+            });
+        });
+    });
+    
+    socket.on('clientAddTopic', function (data) {
+        console.log("[DEBUG] clientAddTopic");
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbTopic, function(err, collection) {
+                // Add new topic.
+               collection.insert({
+                    topic:data.topic,
+                    createby:data.name,
+                    createtime:new Date().getTime()
+                }, {w:-1}, function(err, document) {
+                    console.log(document[0]._id +" " + data.topic);
+                    // Update client.
+                    socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
+                    socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
+                });
             });
         });
     });
