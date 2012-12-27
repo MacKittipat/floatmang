@@ -16,7 +16,7 @@ var tbIdea = "idea";
 var tbComment = "comment";
 var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
-var limit = 2;
+var limit = 10;
 
 // =============== Web App Global Var 
 var app = express();
