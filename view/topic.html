@@ -3,7 +3,7 @@
     <head>
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
@@ -20,7 +20,7 @@
                         }
                         $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
                     }, 'json');
-                });
+                });                
             });
         </script>
     </head>
@@ -39,7 +39,6 @@
                        <a href="/idea/list/?id=<%= documents[key]._id %>">
                            <%= documents[key].topic  %>
                        </a>
-                   </div>
                 <% } %>
             </div>
             <% if(totalTopic > 2) {%>

@@ -6,16 +6,24 @@
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
+            var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
+            socket.on('serverUpdateLike', function(data) {
+                $("#btnLike" + data.ideaId).html("Like (" + data.like + ")");
+            });
+            socket.on('serverUpdateDislike', function(data) {
+                $("#btnDislike" + data.ideaId).html("Hate (" + data.dislike + ")");
+            });
+            function like(ideaId) {
+                socket.emit('clientLikeIdea', {
+                    ideaId: ideaId
+                });                
+            }
+            function dislike(ideaId) {
+                socket.emit('clientDislikeIdea', {
+                    ideaId: ideaId
+                }); 
+            }
             $(document).ready(function() {
-//                $("#btnShowMore").click(function() {
-//                    var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
-//                    $.post('/a/moreidea', {totalDisplayIdea:totalDisplayIdea}, function(data) {
-//                        for(var key in data) {
-//                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
-//                        }
-//                        $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
-//                    }, 'json');
-//                });
             });
         </script>
     </head>
@@ -31,6 +39,14 @@
                        <a href="javascript:void(0);">
                            <%= documents[key].idea  %>
                        </a>
+                       &nbsp;&nbsp;
+                       <span>                           
+                           <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like  %>)</a>
+                       </span>
+                       <span>                           
+                           <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
+                       </span>
+                   </div>
                    </div>
                 <% } %>
             </div>
