@@ -7,7 +7,7 @@ var routes = require('./routes');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = "192.168.51.102";
+var dbHost = '127.0.0.1';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
@@ -15,6 +15,7 @@ var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
 var limitTopic = 2;
+var ObjectID = mongodb.ObjectID;
 
 // =============== Web App Global Var 
 var app = express();
@@ -22,6 +23,8 @@ var listen =  app.listen(appPort);
 var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
+var BSON = require('mongodb').BSONPure;
+
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -82,6 +85,26 @@ app.get('/topic', function(req, res) {
     }
 });
 
+//Edit Topic
+app.get('/topic/edit',function(req,res){
+  
+    //req.boby.id
+     if(loggedIn(req)){
+          //Display Topic To Edit
+          mongoClient.connect(dbUrl,function(err,db){
+              db.collection(tbTopic,function(err,collection){
+                   var obj_id = BSON.ObjectID.createFromHexString(req.query.id);
+                //  var cursorTopic = collection.find({_id : obj_id});
+                      collection.findOne({_id : obj_id}, function(err, documents) {
+                      console.log(req.query.id)
+                       res.render('editTopic',{
+                           documents:documents 
+                       });
+                  });
+              })
+          })
+     }
+})
 // Idea in list mode.
 app.get('/idea/list', function(req, res) {
     if(loggedIn(req)) {
@@ -107,6 +130,8 @@ app.get('/idea/list', function(req, res) {
 app.get('/idea', function(req, res) {
     
 });
+
+
 
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 

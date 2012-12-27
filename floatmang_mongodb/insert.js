@@ -1,7 +1,7 @@
 var mongo = require('mongodb');
 
 // =============== Config
-var dbHost = "192.168.51.102";
+var dbHost = "localhost";
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
