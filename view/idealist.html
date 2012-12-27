@@ -4,6 +4,7 @@
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
@@ -39,11 +40,12 @@
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
                         for(var key in data) {
-                            $("#boxIdea").append("<div><span id='idea" + data[key]._id + "'>" + data[key].idea + "</span>&nbsp;&nbsp;" +
-                            " <span><a id='btnLike" + data[key]._id + "' onclick='like(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
-                            " <span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
-                            " <span><a onclick='edit(\"" + data[key]._id + "\");' href='javascript:void(0);'>Edit</a></span>" + 
-                            "</div>");
+//                            $("#boxIdea").append("<div><span id='idea" + data[key]._id + "'>" + data[key].idea + "</span>&nbsp;&nbsp;" +
+//                            " <span><a id='btnLike" + data[key]._id + "' onclick='like(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
+//                            " <span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
+//                            " <span><a onclick='edit(\"" + data[key]._id + "\");' href='javascript:void(0);'>Edit</a></span>" + 
+//                            "</div>");
+                            $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike}).appendTo("#boxIdea");
                         }
                         $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
                     }, 'json');
@@ -112,9 +114,27 @@
                         </a>
                     </span>
                 </div>            
-
                 <% } %>
             </div>
+            <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
+                <div>
+                    <span id="idea${ideaId}">
+                        ${idea}
+                    </span>
+                    &nbsp;&nbsp;
+                    <span>                           
+                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like (${like})</a>
+                    </span>
+                    <span>                           
+                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate (${dislike})</a>
+                    </span>
+                    <span>
+                        <a onclick="edit('${ideaId}');" href="javascript:void(0);">
+                            Edit
+                        </a>
+                    </span>
+                </div>   
+            </script>
             <% if(totalIdea > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
