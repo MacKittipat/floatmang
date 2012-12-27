@@ -10,10 +10,18 @@
             socket.on('serverUpdateLike', function(data) {
                 $("#btnLike" + data.ideaId).html("Like (" + data.like + ")");
             });
+            socket.on('serverUpdateDislike', function(data) {
+                $("#btnDislike" + data.ideaId).html("Hate (" + data.dislike + ")");
+            });
             function like(ideaId) {
                 socket.emit('clientLikeIdea', {
                     ideaId: ideaId
                 });                
+            }
+            function dislike(ideaId) {
+                socket.emit('clientDislikeIdea', {
+                    ideaId: ideaId
+                }); 
             }
             $(document).ready(function() {
             });
@@ -36,7 +44,7 @@
                            <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like  %>)</a>
                        </span>
                        <span>                           
-                           <a onclick="hate('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
+                           <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
                        </span>
                    </div>
                    </div>

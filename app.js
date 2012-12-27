@@ -159,6 +159,23 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });   
+    
+    socket.on('clientDislikeIdea', function (data) {
+        console.log("[DEBUG] clientDislikeIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by id.
+                collection.findOne({_id:new ObjectID(data.ideaId)}, function(err, document) {
+                    // Update idea. -1 for dislike field.
+                    var dislike = parseInt(document.dislike) - 1;
+                    collection.update({_id:new ObjectID(data.ideaId)}, {$set:{dislike:dislike}}, {w:-1}); 
+                    // Update client.
+                    socket.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                    socket.broadcast.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                });                  
+            });
+        });
+    });   
 });
 
 // =============== Utility Function
