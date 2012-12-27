@@ -21,6 +21,7 @@ var app = express();
 var listen =  app.listen(appPort);
 var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
+var ObjectID = mongodb.ObjectID;
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -59,6 +60,7 @@ app.get('/logout', function(req, res) {
     res.redirect('login');
 });
 
+
 app.get('/topic', function(req, res) {
     if(loggedIn(req)) {
         // Display topic.
@@ -75,9 +77,35 @@ app.get('/topic', function(req, res) {
                 });
             });
         });
-    } else { // If user not login, redirect to login page.
+    } else {
         res.redirect('/');
     }
+});
+
+// Idea in list mode.
+app.get('/idea/list', function(req, res) {
+    if(loggedIn(req)) {
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {            
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}}); // Find idea.
+               cursorIdea.toArray(function(err, documents) {
+                    collection.find().count(function(err, count) { // Count all idea.
+                        res.render('idealist', {
+                            documents:documents,
+                            totalIdea:count
+                        });
+                    });
+               });
+            });    
+        });
+    } else {
+        res.redirect('/');
+    }
+})
+
+// Idea in animation mode.
+app.get('/idea', function(req, res) {
+    
 });
 
 app.post('/a/moretopic', function(req, res) {
