@@ -27,7 +27,7 @@ mongoClient.connect(dbUrl, function(err, db) {
                     
                     // Insert mock data to table topic.        
                     db.collection(tbTopic, function(err, collection) {
-                        for(var i=0; i<3; i++) {
+                        for(var i=0; i<11; i++) {
                             console.log("[DEBUG] : Inserting " + tbTopic + ". key = " + i);  
                             collection.insert({
                                 topic:"topic" + i,
@@ -43,38 +43,40 @@ mongoClient.connect(dbUrl, function(err, db) {
                                 for(var key in documents) {
                                     console.log("[DEBUG] : Inserting " + tbIdea + ". key = " + key);  
                                     // Insert idea.
-                                    db.collection(tbIdea, function(err, collection) {
-                                        collection.insert({
-                                            idea:"idea" + key,
-                                            createby:"user" + key,
-                                            createtime:new Date().getTime(),
-                                            like:Math.ceil((Math.random()*100)+1),
-                                            dislike:Math.ceil((Math.random()*20)+1),
-                                            topic_id:documents[key]._id
-                                        }, {w:-1});
-                                        
-                                        // Insert mock data to comment idea base on idea.
+                                    for(var i=0; i<Math.ceil((Math.random()*10)+1); i++) {
                                         db.collection(tbIdea, function(err, collection) {
-                                            var cursorIdea = collection.find({}, {sort:{like:-1 ,createtime:-1}});
-                                            cursorIdea.toArray(function(err, documents) {
-                                                for(var key in documents) {
-                                                    console.log("[DEBUG] : Inserting " + tbComment + ". key = " + key);  
-                                                    for(var i=0; i<Math.ceil((Math.random()*10)+1); i++) {
-                                                        db.collection(tbComment, function(err, collection) {
-                                                            collection.insert({
-                                                                comment:"comment" + key + "_" + i,
-                                                                commentby:"user" + key,
-                                                                commenttime:new Date().getTime(),
-                                                                like:Math.ceil((Math.random()*100)+1),
-                                                                dislike:Math.ceil((Math.random()*20)+1),
-                                                                idea_id:documents[key]._id
-                                                            }, {w:-1});
-                                                        });
+                                            collection.insert({
+                                                idea:"idea" + i,
+                                                createby:"user" + key,
+                                                createtime:new Date().getTime(),
+                                                like:Math.ceil((Math.random()*100)+1),
+                                                dislike:Math.ceil((Math.random()*20)+1),
+                                                topic_id:documents[key]._id
+                                            }, {w:-1});
+
+                                            // Insert mock data to comment idea base on idea.
+                                            db.collection(tbIdea, function(err, collection) {
+                                                var cursorIdea = collection.find({}, {sort:{like:-1 ,createtime:-1}});
+                                                cursorIdea.toArray(function(err, documents) {
+                                                    for(var key in documents) {
+                                                        console.log("[DEBUG] : Inserting " + tbComment + ". key = " + key);  
+                                                        for(var i=0; i<Math.ceil((Math.random()*10)+1); i++) {
+                                                            db.collection(tbComment, function(err, collection) {
+                                                                collection.insert({
+                                                                    comment:"comment" + key + "_" + i,
+                                                                    commentby:"user" + key,
+                                                                    commenttime:new Date().getTime(),
+                                                                    like:Math.ceil((Math.random()*100)+1),
+                                                                    dislike:Math.ceil((Math.random()*20)+1),
+                                                                    idea_id:documents[key]._id
+                                                                }, {w:-1});
+                                                            });
+                                                        }
                                                     }
-                                                }
+                                                });
                                             });
                                         });
-                                    });
+                                    }
                                 }
                             });
                         });       

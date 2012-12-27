@@ -9,7 +9,7 @@
                         //alert("ready");
                 });
                 $(function() {
-                        $('#savetopic').click(function() {
+                        $('#updatetopic').click(function() {
                                 $.ajax({
                                         url: "http://localhost:8888/newtopic",
                                         type: "post",
@@ -24,7 +24,8 @@
         <form method="post" id="edittopicform">
                 <div>
                         <label>Your topic</label>
-                         <input type="text" name="topic" id="topic"  value="<%= documents.topic  %>"/>
+                         <input type="text" name="topic" id="edittopic"  value="<%= documents.topic  %>"/>
+                         <input type="hidden" id="id" value="<%= documents._id  %>" />
               </div>
             <input type="button" id="updatetopic" value="Update" />
         </form>

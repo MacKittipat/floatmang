@@ -3,7 +3,7 @@
     <head>
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
@@ -20,7 +20,7 @@
                         }
                         $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
                     }, 'json');
-                });
+                });                
             });
         </script>
     </head>
@@ -30,6 +30,9 @@
         </h2>
         <div>
             <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
+            <div>
+            	<a href="/newtopic">new topic</a>
+            </div>
             <div id="boxTopic">
                 <% for(var key in documents) {%>
                    <div>
@@ -45,7 +48,7 @@
                    
                 <% } %>
             </div>
-            <% if(totalTopic > 2) {%>
+            <% if(totalTopic > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
                     Show More

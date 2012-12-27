@@ -14,8 +14,12 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
+<<<<<<< HEAD
 var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
+=======
+var limit = 3;
+>>>>>>> c274e32f1430c4886b2c2141712b60332967e953
 
 // =============== Web App Global Var 
 var app = express();
@@ -52,8 +56,10 @@ app.get('/login', function(req, res) {
 app.post('/login', function(req, res) {  
     // Create session 'name'.
     req.session.name = 'anonymous';
-    if(!req.body.anonymous) { // If not an anonymous.
-        req.session.name = req.body.name; // Get post parameter 'name' and set session.
+    // If not an anonymous.
+    if(!req.body.anonymous) { 
+        // Get post parameter 'name' and set session.
+        req.session.name = req.body.name; 
     }
     res.redirect('topic');
 });
@@ -69,12 +75,17 @@ app.get('/topic', function(req, res) {
         // Display topic.
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbTopic, function(err, collection) {
-                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limitTopic}); // Find topic.
+                // Find topic.
+                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limit}); 
                 cursorTopic.toArray(function(err, documents) { 
-                    collection.find().count(function(err, count) { // Count all topic.
+                    // Count all topic.
+                    collection.find().count(function(err, count) { 
                         res.render('topic', {
                             documents:documents,
-                            totalTopic:count
+                            totalTopic:count,
+                            appHost:appHost,
+                            appPort:appPort,
+                            limit:limit
                         });
                     });
                 });
@@ -85,7 +96,7 @@ app.get('/topic', function(req, res) {
     }
 });
 
-//Edit Topic
+///Show Topic To Edit
 app.get('/topic/edit',function(req,res){
   
     //req.boby.id
@@ -105,17 +116,54 @@ app.get('/topic/edit',function(req,res){
           })
      }
 })
+
+//Update Edit Topic
+app.post('/updatetopic', function(req, res) {
+       
+        var editTopic = req.body.edittopic;
+        var createBy = req.session.name;
+        console.log("edittopic : "+ editTopic);
+        console.log("createBy : " + createBy);
+    
+        // insert data
+        mongoClient.connect(dbUrl, function(err, db) {
+                db.collection(tbTopic, function(err, collection) {
+                        collection.insert({
+                                topic: newTopic,
+                                createby: username,
+                                createtime:new Date().getTime()
+                        }, {w:-1});
+                });
+        });
+});
+
+
+
+
+
+
+
+
+
+
+
 // Idea in list mode.
 app.get('/idea/list', function(req, res) {
     if(loggedIn(req)) {
         mongoClient.connect(dbUrl, function(err, db) { 
-            db.collection(tbIdea, function(err, collection) {            
-               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}}); // Find idea.
+            db.collection(tbIdea, function(err, collection) {        
+                // Find idea by topic id.
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
                cursorIdea.toArray(function(err, documents) {
-                    collection.find().count(function(err, count) { // Count all idea.
+                   // Count all idea.
+                    collection.find().count(function(err, count) { 
                         res.render('idealist', {
                             documents:documents,
-                            totalIdea:count
+                            totalIdea:count,
+                            topicId:req.query.id,
+                            appHost:appHost,
+                            appPort:appPort,
+                            limit:limit
                         });
                     });
                });
@@ -131,14 +179,57 @@ app.get('/idea', function(req, res) {
     
 });
 
+<<<<<<< HEAD
 
+=======
+//render new topic page
+app.get('/newtopic', function(req, res) {
+	console.log("returning newtopicpage.");
+	res.render('newtopic');
+});
+
+//save new topic
+app.post('/newtopic', function(req, res) {
+	console.log("saving new topic");
+	console.log("data : "+ req.body.topic);
+	var newTopic = req.body.topic;
+	var username = req.session.name;
+	console.log("newtopic : "+newTopic);
+	console.log("user : "+username);
+	// insert data
+	mongoClient.connect(dbUrl, function(err, db) { 
+		db.collection(tbTopic, function(err, collection) {
+			collection.insert({
+				topic: newTopic,
+				createby: username,
+				createtime:new Date().getTime() 		
+			}, {w:-1});	
+		});
+	});
+}); 
+>>>>>>> c274e32f1430c4886b2c2141712b60332967e953
 
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbTopic, function(err, collection) {
-            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limitTopic}); // Find topic.
+            // Find topic.
+            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limit}); 
             cursorTopic.toArray(function(err, documents) { 
-                res.json(documents); // Return topic as JSON.   
+                // Return topic as JSON. 
+                res.json(documents);   
+            });
+        });
+    });
+});
+
+app.post('/a/moreidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea.
+            var cursorIdea = collection.find({topic_id:new ObjectID(req.body.topicId)}, {sort:{like:-1, createtime:-1}, skip:req.body.totalDisplayIdea, limit:limit}); 
+            cursorIdea.toArray(function(err, documents) { 
+                // Return idea as JSON. 
+                res.json(documents);   
             });
         });
     });
@@ -156,8 +247,38 @@ console.log('App is running : http://localhost:' + appPort);
 
 // =============== Socket.IO
 io.sockets.on('connection', function (socket) {
-    socket.on('clientSendMessage', function (data) {
-        console.log("Socket : " + data.name);
+    socket.on('clientLikeIdea', function (data) {
+        console.log("[DEBUG] clientLikeIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by id.
+                collection.findOne({_id:new ObjectID(data.ideaId)}, function(err, document) {
+                    // Update idea. +1 for like field.
+                    var like = parseInt(document.like) + 1;
+                    collection.update({_id:new ObjectID(data.ideaId)}, {$set:{like:like}}, {w:-1}); 
+                    // Update client.
+                    socket.emit('serverUpdateLike', {ideaId:data.ideaId, like:like});
+                    socket.broadcast.emit('serverUpdateLike', {ideaId:data.ideaId, like:like});
+                });                  
+            });
+        });
+    });   
+    
+    socket.on('clientDislikeIdea', function (data) {
+        console.log("[DEBUG] clientDislikeIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by id.
+                collection.findOne({_id:new ObjectID(data.ideaId)}, function(err, document) {
+                    // Update idea. -1 for dislike field.
+                    var dislike = parseInt(document.dislike) - 1;
+                    collection.update({_id:new ObjectID(data.ideaId)}, {$set:{dislike:dislike}}, {w:-1}); 
+                    // Update client.
+                    socket.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                    socket.broadcast.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                });                  
+            });
+        });
     });   
 });
 
