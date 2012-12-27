@@ -4,19 +4,22 @@
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
                 $("#frmAddTopic #topic").val("");
-                $("#boxTopic").prepend("<div><a>" + data.topic + "</a></div>");
+//                $("#boxTopic").prepend("<div><a>" + data.topic + "</a></div>");
+                $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic}).prependTo("#boxTopic");
             });
             $(document).ready(function() {
                 $("#btnShowMore").click(function() {
                     var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
                     $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
                         for(var key in data) {
-                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
+                            $("#topicTemplate").tmpl({topicId:data[key]._id, topic:data[key].topic}).appendTo("#boxTopic");
+//                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
                         }
                         $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
                     }, 'json');
@@ -64,6 +67,17 @@
                 </div>
                 <% } %>
             </div>
+            <script id="topicTemplate" type="text/x-jquery-tmpl"> 
+                <div>
+                    <a href="/idea/list/?id=${topicId}">
+                        ${topic}
+                    </a>
+                    &nbsp;&nbsp;
+                    <a href="/topic/edit/?id=${topicId}">
+                        Edit
+                    </a>
+                </div>
+            </script>
             <% if(totalTopic > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
