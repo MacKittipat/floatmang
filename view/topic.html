@@ -1,11 +1,51 @@
+<!DOCTYPE html>
 <html>
-        <head><title>info</title></head>
-        <body>
-            <div id=info>
-                Listing IDEA
+    <head>
+        <title>FloatMang</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#btnShowMore").click(function() {
+                    var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
+                    $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
+//                        if(totalDisplayTopic < <%= totalTopic  %>) {
+//                            $("#btnShowMore").show();
+//                        } else {
+//                            $("#btnShowMore").hide();
+//                        }
+                        for(var key in data) {
+                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
+                        }
+                        $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
+                    }, 'json');
+                });
+            });
+        </script>
+    </head>
+    <body>        
+        <h2>
+            Topic
+        </h2>
+        <div>
+            <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
+            <div id="boxTopic">
+                <% for(var key in documents) {%>
+                   <div>
+                       <a href="/idea/list/?id=<%= documents[key]._id %>">
+                           <%= documents[key].topic  %>
+                       </a>
+                   </div>
+                <% } %>
             </div>
-            <div id="message">
-                Message : <%= data.message %>
+            <% if(totalTopic > 2) {%>
+            <div>
+                <a id="btnShowMore" href="javascript:void(0);">
+                    Show More
+                </a>
             </div>
-        </body>
+            <% } %>
+        </div>
+    </body>
 </html>
