@@ -6,16 +6,66 @@
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
+            var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
+            socket.on('serverUpdateLike', function(data) {
+                $("#btnLike" + data.ideaId).html("Like (" + data.like + ")");
+            });
+            socket.on('serverUpdateDislike', function(data) {
+                $("#btnDislike" + data.ideaId).html("Hate (" + data.dislike + ")");
+            });
+            socket.on('serverUpdateEditIdea', function(data) {
+                $("#idea" + data.ideaId).html(data.idea); 
+                $("#frmEditIdea #ideaId").val("");
+                $("#frmEditIdea #idea").val("");
+            });
+            function like(ideaId) {
+                socket.emit('clientLikeIdea', {
+                    ideaId: ideaId
+                });                
+            }
+            function dislike(ideaId) {
+                socket.emit('clientDislikeIdea', {
+                    ideaId: ideaId
+                }); 
+            }
+            function edit(ideaId) {
+                $("#frmEditIdea #ideaId").val(ideaId);
+                $.post('/a/getidea', {ideaId:ideaId}, function(data) {
+                    $("#frmEditIdea #idea").val(data.idea);
+                }, 'json');
+            }
             $(document).ready(function() {
-//                $("#btnShowMore").click(function() {
-//                    var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
-//                    $.post('/a/moreidea', {totalDisplayIdea:totalDisplayIdea}, function(data) {
-//                        for(var key in data) {
-//                            $("#boxTopic").append('<div><a href="/idea/list/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
-//                        }
-//                        $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
-//                    }, 'json');
-//                });
+                $("#btnShowMore").click(function() {
+                    var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
+                    $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
+                        for(var key in data) {
+                            $("#boxIdea").append("<div><span id='idea" + data[key]._id + "'>" + data[key].idea + "</span>&nbsp;&nbsp;" +
+                            " <span><a id='btnLike" + data[key]._id + "' onclick='like(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
+                            " <span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
+                            " <span><a onclick='edit(\"" + data[key]._id + "\");' href='javascript:void(0);'>Edit</a></span>" + 
+                            "</div>");
+                        }
+                        $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
+                    }, 'json');
+                });         
+                $("#frmEditIdea").submit(function() {
+                    var ideaId = $.trim($("#frmEditIdea #ideaId").val());
+                    var idea = $.trim($("#frmEditIdea #idea").val());
+                    if(!ideaId || !idea) {
+                        return;
+                    }
+                    socket.emit('clientEditIdea', {
+                        ideaId: ideaId, 
+                        idea: idea
+                    }); 
+                });
+                $("#savenewidea").click(function() {
+                    $ajax({
+                        url: "http://localhost:8888/newidea",
+                        type: "post", 
+                        data: $("#newtopicform").serialize()
+                    })
+                });
             });
         </script>
     </head>
@@ -24,17 +74,48 @@
             Idea List
         </h2>
         <div>
+        	<div>
+        		New idea
+                <form id="newideaform">
+                    <div>
+                        <input type="text" id="newidea" value="" placeholder="put your idea"/>
+                        <input type="button" id=savenewidea value="put idea" />
+                    </div>
+                </form>
+            </div>
+            <div>
+                <form id="frmEditIdea" onsubmit="return false;">
+                    <div>
+                        <input type="hidden" id="ideaId" value="" />
+                        <input type="text" id="idea" value="" />
+                        <input type="submit" value="Save" />
+                    </div>
+                </form>
+            </div>
             <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
-            <div id="boxTopic">
+            <div id="boxIdea">
                 <% for(var key in documents) {%>
-                   <div>
-                       <a href="javascript:void(0);">
-                           <%= documents[key].idea  %>
-                       </a>
-                   </div>
+                <div>
+                    <span id="idea<%= documents[key]._id  %>">
+                        <%= documents[key].idea  %>
+                    </span>
+                    &nbsp;&nbsp;
+                    <span>                           
+                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like %>)</a>
+                    </span>
+                    <span>                           
+                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike %>)</a>
+                    </span>
+                    <span>
+                        <a onclick="edit('<%= documents[key]._id  %>');" href="javascript:void(0);">
+                            Edit
+                        </a>
+                    </span>
+                </div>            
+
                 <% } %>
             </div>
-            <% if(totalIdea > 2) {%>
+            <% if(totalIdea > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
                     Show More

@@ -7,7 +7,7 @@ var routes = require('./routes');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = "192.168.51.102";
+var dbHost = '192.168.51.102';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
@@ -15,6 +15,8 @@ var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
 var limitTopic = 2;
+var ObjectID = mongodb.ObjectID;
+var limit = 10;
 
 // =============== Web App Global Var 
 var app = express();
@@ -22,6 +24,7 @@ var listen =  app.listen(appPort);
 var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
+var BSON = require('mongodb').BSONPure;
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -49,8 +52,10 @@ app.get('/login', function(req, res) {
 app.post('/login', function(req, res) {  
     // Create session 'name'.
     req.session.name = 'anonymous';
-    if(!req.body.anonymous) { // If not an anonymous.
-        req.session.name = req.body.name; // Get post parameter 'name' and set session.
+    // If not an anonymous.
+    if(!req.body.anonymous) { 
+        // Get post parameter 'name' and set session.
+        req.session.name = req.body.name; 
     }
     res.redirect('topic');
 });
@@ -66,12 +71,18 @@ app.get('/topic', function(req, res) {
         // Display topic.
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbTopic, function(err, collection) {
-                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limitTopic}); // Find topic.
+                // Find topic.
+                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limit}); 
                 cursorTopic.toArray(function(err, documents) { 
-                    collection.find().count(function(err, count) { // Count all topic.
+                    // Count all topic.
+                    collection.find().count(function(err, count) { 
                         res.render('topic', {
                             documents:documents,
-                            totalTopic:count
+                            totalTopic:count,
+                            appHost:appHost,
+                            appPort:appPort,
+                            limit:limit,
+                            name:req.session.name
                         });
                     });
                 });
@@ -82,17 +93,65 @@ app.get('/topic', function(req, res) {
     }
 });
 
+///Show Topic To Edit
+app.get('/topic/edit',function(req,res){
+  
+    //req.boby.id
+     if(loggedIn(req)){
+          //Display Topic To Edit
+          mongoClient.connect(dbUrl,function(err,db){
+              db.collection(tbTopic,function(err,collection){
+                   var obj_id = BSON.ObjectID.createFromHexString(req.query.id);
+                //  var cursorTopic = collection.find({_id : obj_id});
+                      collection.findOne({_id : obj_id}, function(err, documents) {
+                      console.log(req.query.id)
+                       res.render('editTopic',{
+                           documents:documents 
+                       });
+                  });
+              })
+          })
+     }
+})
+
+//Update Edit Topic
+app.post('/updatetopic', function(req, res) {
+       
+        var editTopic = req.body.edittopic;
+        var createBy = req.session.name;
+        console.log("edittopic : "+ editTopic);
+        console.log("createBy : " + createBy);
+    
+        // insert data
+        mongoClient.connect(dbUrl, function(err, db) {
+                db.collection(tbTopic, function(err, collection) {
+                        collection.insert({
+                                topic: newTopic,
+                                createby: username,
+                                createtime:new Date().getTime()
+                        }, {w:-1});
+                });
+        });
+});
+
 // Idea in list mode.
 app.get('/idea/list', function(req, res) {
     if(loggedIn(req)) {
         mongoClient.connect(dbUrl, function(err, db) { 
-            db.collection(tbIdea, function(err, collection) {            
-               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}}); // Find idea.
+            db.collection(tbIdea, function(err, collection) {        
+                // Find idea by topic id.
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
                cursorIdea.toArray(function(err, documents) {
-                    collection.find().count(function(err, count) { // Count all idea.
+                   // Count all idea.
+                    collection.find().count(function(err, count) { 
                         res.render('idealist', {
                             documents:documents,
-                            totalIdea:count
+                            totalIdea:count,
+                            topicId:req.query.id,
+                            appHost:appHost,
+                            appPort:appPort,
+                            limit:limit,
+                            name:req.session.name
                         });
                     });
                });
@@ -108,13 +167,77 @@ app.get('/idea', function(req, res) {
     
 });
 
+//render new topic page
+app.get('/newtopic', function(req, res) {
+	console.log("returning newtopicpage.");
+	res.render('newtopic');
+});
+
+//save new topic
+app.post('/newtopic', function(req, res) {
+	console.log("saving new topic");
+	console.log("data : "+ req.body.topic);
+	var newTopic = req.body.topic;
+	var username = req.session.name;
+	console.log("newtopic : "+newTopic);
+	console.log("user : "+username);
+	// insert data
+	mongoClient.connect(dbUrl, function(err, db) { 
+		db.collection(tbTopic, function(err, collection) {
+			collection.insert({
+				topic: newTopic,
+				createby: username,
+				createtime:new Date().getTime() 		
+			}, {w:-1});	
+		});
+	});
+}); 
+
+//request new idea page
+app.get('/newidea', function(req, res) {
+	console.log("returning new topicpage");
+	res.render('newidea');
+});
+
+//save new idea
+app.post('/newidea', function(req, res) {
+	console.log("saving new idea of topic : ");	
+});
+
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbTopic, function(err, collection) {
-            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limitTopic}); // Find topic.
+            // Find topic.
+            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limit}); 
             cursorTopic.toArray(function(err, documents) { 
-                res.json(documents); // Return topic as JSON.   
+                // Return topic as JSON. 
+                res.json(documents);   
             });
+        });
+    });
+});
+
+app.post('/a/moreidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea by topic id.
+            var cursorIdea = collection.find({topic_id:new ObjectID(req.body.topicId)}, {sort:{like:-1, createtime:-1}, skip:req.body.totalDisplayIdea, limit:limit}); 
+            cursorIdea.toArray(function(err, documents) { 
+                // Return idea as JSON. 
+                res.json(documents);   
+            });
+        });
+    });
+});
+
+app.post('/a/getidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea by idea.
+            collection.findOne({_id:new ObjectID(req.body.ideaId)}, function(err, document) {
+                // Return idea as JSON. 
+                res.json(document);  
+            }); 
         });
     });
 });
@@ -131,9 +254,71 @@ console.log('App is running : http://localhost:' + appPort);
 
 // =============== Socket.IO
 io.sockets.on('connection', function (socket) {
-    socket.on('clientSendMessage', function (data) {
-        console.log("Socket : " + data.name);
+    socket.on('clientLikeIdea', function (data) {
+        console.log("[DEBUG] clientLikeIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by id.
+                collection.findOne({_id:new ObjectID(data.ideaId)}, function(err, document) {
+                    // Update idea. +1 for like field.
+                    var like = parseInt(document.like) + 1;
+                    collection.update({_id:new ObjectID(data.ideaId)}, {$set:{like:like}}, {w:-1}); 
+                    // Update client.
+                    socket.emit('serverUpdateLike', {ideaId:data.ideaId, like:like});
+                    socket.broadcast.emit('serverUpdateLike', {ideaId:data.ideaId, like:like});
+                });                  
+            });
+        });
     });   
+    
+    socket.on('clientDislikeIdea', function (data) {
+        console.log("[DEBUG] clientDislikeIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by id.
+                collection.findOne({_id:new ObjectID(data.ideaId)}, function(err, document) {
+                    // Update idea. -1 for dislike field.
+                    var dislike = parseInt(document.dislike) - 1;
+                    collection.update({_id:new ObjectID(data.ideaId)}, {$set:{dislike:dislike}}, {w:-1}); 
+                    // Update client.
+                    socket.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                    socket.broadcast.emit('serverUpdateDislike', {ideaId:data.ideaId, dislike:dislike});
+                });                  
+            });
+        });
+    });   
+    
+    socket.on('clientEditIdea', function (data) {
+        console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {
+                // Find idea by idea.
+                collection.update({_id:new ObjectID(data.ideaId)}, {$set:{idea:data.idea}}, {w:-1});
+                // Update client.
+                socket.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
+                socket.broadcast.emit('serverUpdateEditIdea', {ideaId:data.ideaId, idea:data.idea});
+            });
+        });
+    });
+    
+    socket.on('clientAddTopic', function (data) {
+        console.log("[DEBUG] clientAddTopic");
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbTopic, function(err, collection) {
+                // Add new topic.
+               collection.insert({
+                    topic:data.topic,
+                    createby:data.name,
+                    createtime:new Date().getTime()
+                }, {w:-1}, function(err, document) {
+                    console.log(document[0]._id +" " + data.topic);
+                    // Update client.
+                    socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
+                    socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
+                });
+            });
+        });
+    });
 });
 
 // =============== Utility Function
