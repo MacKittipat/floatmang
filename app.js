@@ -108,6 +108,32 @@ app.get('/idea', function(req, res) {
     
 });
 
+//render new topic page
+app.get('/newtopic', function(req, res) {
+	console.log("returning newtopicpage.");
+	res.render('newtopic');
+});
+
+//save new topic
+app.post('/newtopic', function(req, res) {
+	console.log("saving new topic");
+	console.log("data : "+ req.body.topic);
+	var newTopic = req.body.topic;
+	var username = req.session.name;
+	console.log("newtopic : "+newTopic);
+	console.log("user : "+username);
+	// insert data
+	mongoClient.connect(dbUrl, function(err, db) { 
+		db.collection(tbTopic, function(err, collection) {
+			collection.insert({
+				topic: newTopic,
+				createby: username,
+				createtime:new Date().getTime() 		
+			}, {w:-1});	
+		});
+	});
+}); 
+
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbTopic, function(err, collection) {
