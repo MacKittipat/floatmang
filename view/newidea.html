@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-	<title>create new topic</title>
+	<title>create new idea</title>
 	<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -11,22 +11,22 @@
 		$(function() {
 			$('#savetopic').click(function() {
 				$.ajax({
-					url: "http://localhost:8888/newtopic",
+					url: "http://localhost:8888/newidea",
 					type: "post", 
-					data: $("#newtopicform").serialize()
+					data: $("#newideaform").serialize(),
 				});
 			})
 		});
 	</script>
 </head>
 <body>
-	Create new topic
-	<form method="post" id="newtopicform">
+	Create new idea
+	<form method="post" id="newideaform">
 		<div>
 			<label>Your topic</label>
- 			<input type="text" name="topic" id="topic" />
+ 			<input type="text" name="idea" id="idea" />
       	</div>
-            <input type="button" id="savetopic" value="Save" />
+            <input type="button" id="saveidea" value="Save" />
 	</form>	
 </body>
 </html>

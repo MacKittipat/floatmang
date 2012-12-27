@@ -40,7 +40,15 @@
                         }
                         $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
                     }, 'json');
-                });                
+                });  
+                
+                $("#savenewidea").click(function() {
+                	$ajax({
+                		url: "http://localhost:8888/newidea",
+						type: "post", 
+						data: $("#newtopicform").serialize()
+                	})
+                });
             });
         </script>
     </head>
@@ -49,6 +57,15 @@
             Idea List
         </h2>
         <div>
+        	<div>
+        		New idea
+                <form id="newideaform">
+                    <div>
+                        <input type="text" id="newidea" value="" placeholder="put your idea"/>
+                        <input type="button" id=savenewidea value="put idea" />
+                    </div>
+                </form>
+            </div>
             <div>
                 <form id="frmEditIdea">
                     <div>

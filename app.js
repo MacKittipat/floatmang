@@ -7,7 +7,7 @@ var routes = require('./routes');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = '127.0.0.1';
+var dbHost = '192.168.51.102';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
@@ -203,6 +203,16 @@ app.post('/newtopic', function(req, res) {
 	});
 }); 
 
+//request new idea page
+app.get('/newidea', function(req, res) {
+	console.log("returning new topicpage");
+	res.render('newidea');
+});
+
+//save new idea
+app.post('/newidea', function(req, res) {
+	console.log("saving new idea of topic : ");	
+});
 
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
