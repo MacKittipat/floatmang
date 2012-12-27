@@ -14,12 +14,10 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
-<<<<<<< HEAD
 var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
-=======
 var limit = 3;
->>>>>>> c274e32f1430c4886b2c2141712b60332967e953
+
 
 // =============== Web App Global Var 
 var app = express();
@@ -179,9 +177,6 @@ app.get('/idea', function(req, res) {
     
 });
 
-<<<<<<< HEAD
-
-=======
 //render new topic page
 app.get('/newtopic', function(req, res) {
 	console.log("returning newtopicpage.");
@@ -207,7 +202,7 @@ app.post('/newtopic', function(req, res) {
 		});
 	});
 }); 
->>>>>>> c274e32f1430c4886b2c2141712b60332967e953
+
 
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
