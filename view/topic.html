@@ -34,7 +34,13 @@
                        <a href="/idea/list/?id=<%= documents[key]._id %>">
                            <%= documents[key].topic  %>
                        </a>
+                      &nbsp;
+                             <a href="/topic/edit/?id=<%= documents[key]._id %>">
+                               Edit
+                             </a>
+                       
                    </div>
+                   
                 <% } %>
             </div>
             <% if(totalTopic > limit) {%>
@@ -43,6 +49,7 @@
                     Show More
                 </a>
             </div>
+             
             <% } %>
         </div>
     </body>

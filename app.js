@@ -7,14 +7,17 @@ var routes = require('./routes');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = "192.168.51.102";
+var dbHost = '192.168.51.102';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
+var limitTopic = 2;
+var ObjectID = mongodb.ObjectID;
 var limit = 3;
+
 
 // =============== Web App Global Var 
 var app = express();
@@ -22,6 +25,8 @@ var listen =  app.listen(appPort);
 var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
+var BSON = require('mongodb').BSONPure;
+
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -89,6 +94,57 @@ app.get('/topic', function(req, res) {
     }
 });
 
+///Show Topic To Edit
+app.get('/topic/edit',function(req,res){
+  
+    //req.boby.id
+     if(loggedIn(req)){
+          //Display Topic To Edit
+          mongoClient.connect(dbUrl,function(err,db){
+              db.collection(tbTopic,function(err,collection){
+                   var obj_id = BSON.ObjectID.createFromHexString(req.query.id);
+                //  var cursorTopic = collection.find({_id : obj_id});
+                      collection.findOne({_id : obj_id}, function(err, documents) {
+                      console.log(req.query.id)
+                       res.render('editTopic',{
+                           documents:documents 
+                       });
+                  });
+              })
+          })
+     }
+})
+
+//Update Edit Topic
+app.post('/updatetopic', function(req, res) {
+       
+        var editTopic = req.body.edittopic;
+        var createBy = req.session.name;
+        console.log("edittopic : "+ editTopic);
+        console.log("createBy : " + createBy);
+    
+        // insert data
+        mongoClient.connect(dbUrl, function(err, db) {
+                db.collection(tbTopic, function(err, collection) {
+                        collection.insert({
+                                topic: newTopic,
+                                createby: username,
+                                createtime:new Date().getTime()
+                        }, {w:-1});
+                });
+        });
+});
+
+
+
+
+
+
+
+
+
+
+
 // Idea in list mode.
 app.get('/idea/list', function(req, res) {
     if(loggedIn(req)) {
@@ -146,6 +202,17 @@ app.post('/newtopic', function(req, res) {
 		});
 	});
 }); 
+
+//request new idea page
+app.get('/newidea', function(req, res) {
+	console.log("returning new topicpage");
+	res.render('newidea');
+});
+
+//save new idea
+app.post('/newidea', function(req, res) {
+	console.log("saving new idea of topic : ");	
+});
 
 app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
