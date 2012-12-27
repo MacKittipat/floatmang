@@ -14,7 +14,7 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
-var limitTopic = 2;
+var limit = 3;
 
 // =============== Web App Global Var 
 var app = express();
@@ -69,7 +69,7 @@ app.get('/topic', function(req, res) {
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbTopic, function(err, collection) {
                 // Find topic.
-                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limitTopic}); 
+                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limit}); 
                 cursorTopic.toArray(function(err, documents) { 
                     // Count all topic.
                     collection.find().count(function(err, count) { 
@@ -77,7 +77,8 @@ app.get('/topic', function(req, res) {
                             documents:documents,
                             totalTopic:count,
                             appHost:appHost,
-                            appPort:appPort
+                            appPort:appPort,
+                            limit:limit
                         });
                     });
                 });
@@ -94,15 +95,17 @@ app.get('/idea/list', function(req, res) {
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbIdea, function(err, collection) {        
                 // Find idea by topic id.
-               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}}); 
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
                cursorIdea.toArray(function(err, documents) {
                    // Count all idea.
                     collection.find().count(function(err, count) { 
                         res.render('idealist', {
                             documents:documents,
                             totalIdea:count,
+                            topicId:req.query.id,
                             appHost:appHost,
-                            appPort:appPort
+                            appPort:appPort,
+                            limit:limit
                         });
                     });
                });
@@ -122,9 +125,22 @@ app.post('/a/moretopic', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbTopic, function(err, collection) {
             // Find topic.
-            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limitTopic}); 
+            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limit}); 
             cursorTopic.toArray(function(err, documents) { 
                 // Return topic as JSON. 
+                res.json(documents);   
+            });
+        });
+    });
+});
+
+app.post('/a/moreidea', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbIdea, function(err, collection) {
+            // Find idea.
+            var cursorIdea = collection.find({topic_id:new ObjectID(req.body.topicId)}, {sort:{like:-1, createtime:-1}, skip:req.body.totalDisplayIdea, limit:limit}); 
+            cursorIdea.toArray(function(err, documents) { 
+                // Return idea as JSON. 
                 res.json(documents);   
             });
         });

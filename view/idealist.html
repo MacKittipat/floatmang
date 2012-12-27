@@ -24,6 +24,23 @@
                 }); 
             }
             $(document).ready(function() {
+                $("#btnShowMore").click(function() {
+                    var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
+                    $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
+//                        if(totalDisplayTopic < <%= totalIdea  %>) {
+//                            $("#btnShowMore").show();
+//                        } else {
+//                            $("#btnShowMore").hide();
+//                        }
+                        for(var key in data) {
+                            $("#boxIdea").append("<div>" + data[key].idea + "&nbsp;&nbsp;" +
+                            "<span><a id='btnLike" + data[key]._id + "' onclick='like(\'" + data[key]._id +"\');' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
+                            "<span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\'" + data[key]._id +"\');' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
+                            "</div>");
+                        }
+                        $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
+                    }, 'json');
+                });                
             });
         </script>
     </head>
@@ -32,25 +49,30 @@
             Idea List
         </h2>
         <div>
+            <div>
+                <form id="frmEditIdea">
+                    <div>
+                        <input type="text" id="idea" value="" />
+                        <input type="submit" value="Save" />
+                    </div>
+                </form>
+            </div>
             <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
-            <div id="boxTopic">
+            <div id="boxIdea">
                 <% for(var key in documents) {%>
-                   <div>
-                       <a href="javascript:void(0);">
-                           <%= documents[key].idea  %>
-                       </a>
-                       &nbsp;&nbsp;
-                       <span>                           
-                           <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like  %>)</a>
-                       </span>
-                       <span>                           
-                           <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
-                       </span>
-                   </div>
-                   </div>
+                <div>
+                    <%= documents[key].idea  %>
+                    &nbsp;&nbsp;
+                    <span>                           
+                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like  %>)</a>
+                    </span>
+                    <span>                           
+                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike  %>)</a>
+                    </span>
+                </div>            
                 <% } %>
             </div>
-            <% if(totalIdea > 2) {%>
+            <% if(totalIdea > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
                     Show More

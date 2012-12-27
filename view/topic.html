@@ -36,9 +36,10 @@
                        <a href="/idea/list/?id=<%= documents[key]._id %>">
                            <%= documents[key].topic  %>
                        </a>
+                   </div>
                 <% } %>
             </div>
-            <% if(totalTopic > 2) {%>
+            <% if(totalTopic > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
                     Show More
