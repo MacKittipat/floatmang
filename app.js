@@ -308,7 +308,7 @@ io.sockets.on('connection', function (socket) {
     			}, {w:-1}, function(err, document) {
     				console.log("updaing client");
     				socket.emit('servreSaveNewIdea',{ideaId: document[0]._id, newIdea: data.newIdea});
-    				socket.broadcast.emit('servreSaveNewIdea',{ideaId: document[0]._id, newIdea: data.newIdea});
+    				socket.broadcast.emit('servreSaveNewIdea',{topicId: data.topicId, newIdea: data.newIdea});
     			});
     		})
     	});

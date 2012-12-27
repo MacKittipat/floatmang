@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Topics &middot; Twitter Bootstrap</title>
+    <title>Ideas &middot; Twitter Bootstrap</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -47,12 +47,10 @@
             <a class="brand" href="topic.html">FloatMang!</a>
           <div class="nav-collapse collapse">
              <div class="navbar-form pull-right">
-                  <ul class="nav">
-                      <!--<li class="active"><a href="#">Home</a></li>-->
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#about">Logout</a></li>
-              
-            </ul> 
+             <ul class="nav">
+                <li><a href="#about">About Us</a></li>
+                <li><button type="submit" class="btn btn-small"><strong>Sign Out</strong></button></li>
+             </ul> 
             </div>
           </div><!--/.nav-collapse -->
         </div>
@@ -67,81 +65,70 @@
 
     <div class="container">
 
-      <div class="row topic">
-        <div class="span9"><h4><span class="leftq"></span>What we will have lunch?<span class="rightq"></span></h4></div>
-        <div class="span0"><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New idea</a>&nbsp;
-        <a href="floatidea.html" class="btn btn-secondary">Float View</a></div>
+      <div class="row">
+            <div class="span7 offset1"><h4><span class="leftq"></span>Where should we go for the next company trip?<span class="rightq"></span></h4></div>
+              <div class="span4">
+                  <h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i> New idea</a></h4>
+              </div>
 
-        <!-- Modal -->
-        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Start new topic</h3>
-          </div>
-          <div class="modal-body">
-              <form>
-                <input class="input-block-level" type="text" id="inputTopic" placeholder="Type your topic here">
-              </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button class="btn btn-primary">Start</button>
-          </div> 
-        </div>
+            <!-- Modal -->
+            <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel">Share your idea</h3>
+              </div>
+              <div class="modal-body">
+                  <form>
+                    <input class="input-block-level" type="text" id="inputIdea" placeholder="Type your idea here">
+                  </form>
+              </div>
+              <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                <button class="btn btn-primary">Share</button>
+              </div> 
+            </div>
+      </div>
+            
+            <div class="row">
+                <div class="span7 offset1"><h5>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Se.</h5></div>
+                <div class="span4">
+                    <h5>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> 54</a>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> 4</a>
+                    </h5>
+                </div>
+            </div>
+            
+            <div class="row">
+            <div class="span7 offset1"><h5>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Se.</h5></div>
+            <div class="span4">
+                <h5>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> 145</a>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> 35</a>
+                </h5>
+            </div></div>
+            
+            <div class="row">
+            <div class="span7 offset1"><h5>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Se.</h5></div>
+            <div class="span4">
+                <h5>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> 31</a>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> 2</a>
+                </h5>
+            </div></div>
+            
+            <div class="row">
+            <div class="span7 offset1"><h5>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Se.</h5></div>
+            <div class="span3">
+                <h5>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> 66</a>
+                        <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> 1</a>
+                </h5>
+            </div></div>
         
         
       </div>
-      
-        <div class="row list">
-            <div class="span9"><h5>Topic 1</h5></div>
-            <div class="span2">
-                <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 2</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 3</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 4</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 5</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 6</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 7</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        <div class="row list">
-            <div class="span9"><h5>Topic 8</h5></div>
-            <div class="span2">
-            <h5><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-up"></i>888</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-thumbs-down"></i>555</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i>666</a><a class="btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
-            </div>
-        </div>
-        
-
     </div> <!-- /container -->
       
         
