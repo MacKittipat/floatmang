@@ -14,6 +14,7 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var tbComment = "comment";
+var limitTopic = 2;
 
 // =============== Web App Global Var 
 var app = express();
@@ -26,18 +27,25 @@ app.engine('html', ejs.__express); // Use ejs template engine.
 app.set('views', __dirname + '/view'); // Set view dir.
 app.set('view engine', 'html'); // Set view extension.
 app.use(express.static(__dirname + '/resource/js')); // Import all static file in /resource/js.
-app.use(express.bodyParser());
-app.use(express.cookieParser());
+app.use(express.bodyParser()); // Enable req.body.PARAMETER.
+app.use(express.cookieParser()); // Enable session.
 app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
 
 // =============== Web App Route
 app.get('/', function(req, res) {
-    if(req.session.name) { // If user login already.
-        res.redirect('topic'); // Redirect to topic page.
+    if(loggedIn(req)) {
+        res.redirect('topic');
+    }
+    res.redirect('login');
+});
+
+app.get('/login', function(req, res) {
+    if(loggedIn(req)) {
+        res.redirect('topic');
     }
     res.render('login');
 });
-app.post('/', function(req, res) {  
+app.post('/login', function(req, res) {  
     // Create session 'name'.
     req.session.name = 'anonymous';
     if(!req.body.anonymous) { // If not an anonymous.
@@ -45,31 +53,51 @@ app.post('/', function(req, res) {
     }
     res.redirect('topic');
 });
+
+app.get('/logout', function(req, res) {
+    req.session.destroy();
+    res.redirect('login');
+});
+
 app.get('/topic', function(req, res) {
-    if(req.session.name) { // If user login already.
+    if(loggedIn(req)) {
         // Display topic.
         mongoClient.connect(dbUrl, function(err, db) { 
-            console.log(1);
             db.collection(tbTopic, function(err, collection) {
-                var cursorTopic = collection.find({}, {sort:{createtime:-1}});
-                console.log(2);
-                cursorTopic.toArray(function(err, documents) {
-                    console.log(3);
-                    for(var key in documents) {
-                        console.log(documents[key].topic + " | " + documents[key].createby + " | " + documents[key].createtime);
-                    }
+                var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limitTopic}); // Find topic.
+                cursorTopic.toArray(function(err, documents) { 
+                    collection.find().count(function(err, count) { // Count all topic.
+                        res.render('topic', {
+                            documents:documents,
+                            totalTopic:count
+                        });
+                    });
                 });
             });
         });
-        res.render('topic');
     } else { // If user not login, redirect to login page.
         res.redirect('/');
     }
 });
+
+app.post('/a/moretopic', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbTopic, function(err, collection) {
+            var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limitTopic}); // Find topic.
+            cursorTopic.toArray(function(err, documents) { 
+                res.json(documents); // Return topic as JSON.   
+            });
+        });
+    });
+});
+
 app.get('/test', function(req, res) {
     res.render('test');
 });
-    
+
+app.get('/json', function(req, res) {
+    res.json({a:1});
+});
 
 console.log('App is running : http://localhost:' + appPort);
 
@@ -80,3 +108,14 @@ io.sockets.on('connection', function (socket) {
     });   
 });
 
+// =============== Utility Function
+/*
+ * Check user log in.
+ * If user login already, return true.
+ */
+function loggedIn(req) {
+    if(req.session.name) {
+        return true;
+    }
+    return false;
+}

@@ -7,11 +7,46 @@
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-
+                $("#btnShowMore").click(function() {
+                    var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
+                    $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
+//                        if(totalDisplayTopic < <%= totalTopic  %>) {
+//                            $("#btnShowMore").show();
+//                        } else {
+//                            $("#btnShowMore").hide();
+//                        }
+                        for(var key in data) {
+                            console.log(data[key]);
+                            $("#boxTopic").append('<div><a href="/topic/view/?id=' + data[key]._id + '">' + data[key].topic + '</a></div>');
+                        }
+                        $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
+                    }, 'json');
+                });
             });
         </script>
     </head>
     <body>        
-        Topic
+        <h2>
+            Topic
+        </h2>
+        <div>
+            <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
+            <div id="boxTopic">
+                <% for(var key in documents) {%>
+                   <div>
+                       <a href="/topic/view/?id=<%= documents[key]._id %>">
+                           <%= documents[key].topic  %>
+                       </a>
+                   </div>
+                <% } %>
+            </div>
+            <% if(totalTopic > 2) {%>
+            <div>
+                <a id="btnShowMore" href="javascript:void(0);">
+                    Show More
+                </a>
+            </div>
+            <% } %>
+        </div>
     </body>
 </html>
