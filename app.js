@@ -5,7 +5,7 @@ var mongodb = require('mongodb');
 var routes = require('./routes');
 
 // =============== Config
-var appHost = '127.0.0.1';
+var appHost = '192.168.51.102';
 var appPort = 8888;
 var dbHost = '192.168.51.102';
 var dbPort = 27017;
@@ -16,7 +16,7 @@ var tbIdea = "idea";
 var tbComment = "comment";
 var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
-var limit = 10;
+var limit = 2;
 
 // =============== Web App Global Var 
 var app = express();
