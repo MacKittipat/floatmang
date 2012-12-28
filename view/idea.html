@@ -1,10 +1,170 @@
+
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>FloatMang</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ideas &middot; Twitter Bootstrap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/font/gooddog-font.css" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.css" />
+    <!-- Le styles -->
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+      }
+
+    </style>
+    <link rel="stylesheet" href="stylesheet.css" type="text/css" charset="utf-8">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <img src="/img/float-logo.png" alt="Floatmang Logo" class="logo" />
+            <a class="brand" href="topic.html">FloatMang!</a>
+          <div class="nav-collapse collapse">
+             <div class="navbar-form pull-right">
+             <ul class="nav">
+                <li><a href="topic.html">View Topics</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li>
+                    <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    Username
+                    <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        
+                        <li><a href="#about">Signout</a></li>
+                    </ul>
+                    </div>
+                    
+                </li>
+             </ul> 
+            </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+      
+      
+           
+           
+           
+
+
+    <div class="container">
+
+      <div class="row">
+          <div class="span10 offset1  topic">
+            <div class="span7"><h4><span class="leftq"></span>Where should we go for the next company trip?<span class="rightq"></span></h4></div>
+              <div class="span2">
+                  <h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i> New idea</a>
+                    <a href="floatidea.html" class="btn">
+                        <img src="/img/float-icon.gif" alt="" border="1" /></a></h4>
+              </div>
+
+            <!-- Modal -->
+            <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <form id="frmAddIdea" onsubmit="return false;">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel">Share your idea</h3>
+              </div>
+	              <div class="modal-body">
+	                  
+	                  	<input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
+	                    <input type="hidden" id="name" value="<%= name %>" />
+	                  
+	                    <input class="input-block-level" type="text" id="addIdea" placeholder="Type your idea here">
+	              </div>
+	              <div class="modal-footer">
+	                <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="Cancle" /> 
+	                <input type="submit" class="btn btn-primary" value="Share" />
+	              </div> 
+	            </form>
+            </div>
+          </div>
+      </div>
+      
+      
+      <div id="boxIdea">
+      	<% for(var key in documents) {%>
+      		<div class="row">
+      			<div class="span10 offset1  list">
+                <div class="span7" id="idea<%= documents[key]._id  %>"><h5><%= documents[key].idea  %></h5></div>
+                <div class="span2">
+                    <h5>
+                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> <%= documents[key].like %></a>
+                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> <%= documents[key].dislike %></a>
+                    </h5>
+                </div>
+                </div>		
+      		</div>
+      	<% } %>
+      </div>
+      
+      <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
+
+			<div class="row">
+      			<div class="span10 offset1  list">
+                <div class="span7" id="idea${ideaId}"><h5>${idea}</h5></div>
+                <div class="span2">
+                    <h5>
+                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> 0</a>
+                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> 0</a>
+                    </h5>
+                </div>
+                </div>		
+      		</div>
+
+            </script>
+        
+        	<% if(totalIdea > limit) {%>
+            <div>
+                <a id="btnShowMore" href="javascript:void(0);">
+                    Show More
+                </a>
+            </div>
+            <% } %>
+      </div>
+    </div> <!-- /container -->
+      
+        
+        
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script>
+        $(document).ready(function() {
+            $('.tooltips').tooltip()
+        });        
+    </script>
+    
+    	<script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
+    	<script type="text/javascript" src="/jquery.tmpl.min.js"></script>
+    	<script type="text/javascript" src="/js/bootstrap.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
@@ -18,8 +178,8 @@
                 $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:data.like, dislike:data.dislike}).prependTo("#boxIdea");
                  // Remove last idea after add new one.
-                 if($(".rowIdea").size() > <%= limit %>) {
-                    $("#boxIdea .rowIdea:last").remove();
+                 if($(".row").size() > <%= limit %>) {
+                    $("#boxIdea .row:last").remove();
                  } else { // Add totalDisplayIdea if total idea < limit
                      $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
                  }               
@@ -68,6 +228,7 @@
                         name:name,
                         idea: idea
                     }); 
+                    $('#myModal').modal('hide')
                 });
                 $("#frmEditIdea").submit(function() {
                     var ideaId = $.trim($("#frmEditIdea #ideaId").val());
@@ -79,88 +240,12 @@
                         ideaId: ideaId, 
                         idea: idea
                     }); 
+                    $('#myModal').modal('hide')
                 });
             });
         </script>
-    </head>
-    <body>        
-        <h2>
-            Idea List
-        </h2>
-        <div>
-            <div>
-                <h3>
-                    New Idea
-                </h3>
-                <form id="frmAddIdea" onsubmit="return false;">
-                    <div>
-                        <input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
-                        <input type="hidden" id="name" value="<%= name %>" />
-                        <input type="text" id="addIdea" value="" />
-                        <input type="submit" value="Add" />
-                    </div>
-                </form>
-            </div>
-            <div>
-                <h3>
-                    Edit Idea
-                </h3>
-                <form id="frmEditIdea" onsubmit="return false;">
-                    <div>
-                        <input type="hidden" id="ideaId" value="" />
-                        <input type="text" id="editIdea" value="" />
-                        <input type="submit" value="Save" />
-                    </div>
-                </form>
-            </div>
-            <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
-            <div id="boxIdea">
-                <% for(var key in documents) {%>
-                <div class="rowIdea">
-                    <span id="idea<%= documents[key]._id  %>">
-                        <%= documents[key].idea  %>
-                    </span>
-                    &nbsp;&nbsp;
-                    <span>                           
-                        <a id="btnLike<%= documents[key]._id  %>" onclick="like('<%= documents[key]._id  %>');" href="javascript:void(0);">Like (<%= documents[key].like %>)</a>
-                    </span>
-                    <span>                           
-                        <a id="btnDislike<%= documents[key]._id  %>" onclick="dislike('<%= documents[key]._id  %>');" href="javascript:void(0);">Hate (<%= documents[key].dislike %>)</a>
-                    </span>
-                    <span>
-                        <a onclick="edit('<%= documents[key]._id  %>');" href="javascript:void(0);">
-                            Edit
-                        </a>
-                    </span>
-                </div>            
-                <% } %>
-            </div>
-            <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
-                <div class="rowIdea">
-                    <span id="idea${ideaId}">
-                        ${idea}
-                    </span>
-                    &nbsp;&nbsp;
-                    <span>                           
-                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like (0)</a>
-                    </span>
-                    <span>                           
-                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate (0)</a>
-                    </span>
-                    <span>
-                        <a onclick="edit('${ideaId}');" href="javascript:void(0);">
-                            Edit
-                        </a>
-                    </span>
-                </div>  
-            </script>
-            <% if(totalIdea > limit) {%>
-            <div>
-                <a id="btnShowMore" href="javascript:void(0);">
-                    Show More
-                </a>
-            </div>
-            <% } %>
-        </div>
-    </body>
+
+  </body>
 </html>
+
+
