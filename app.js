@@ -14,7 +14,7 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var ObjectID = mongodb.ObjectID;
-var limit = 3;
+var limit = 10;
 
 // =============== Web App Global Var 
 var app = express();
@@ -109,14 +109,20 @@ app.get('/idea', function(req, res) {
                cursorIdea.toArray(function(err, documents) {
                    // Count all idea.
                     collection.find().count(function(err, count) { 
-                        res.render('idea', {
-                            documents:documents,
-                            totalIdea:count,
-                            topicId:req.query.id,
-                            appHost:appHost,
-                            appPort:appPort,
-                            limit:limit,
-                            name:req.session.name
+                        // Find topic by topicId.
+                        db.collection(tbTopic, function(err, collection) {
+                            collection.findOne({_id:new ObjectID(req.query.id)}, function(err, document) {
+                                res.render('idea', {
+                                    documents:documents,
+                                    totalIdea:count,
+                                    topicId:req.query.id,
+                                    topic:document.topic,
+                                    appHost:appHost,
+                                    appPort:appPort,
+                                    limit:limit,
+                                    name:req.session.name
+                                });
+                            }); 
                         });
                     });
                });
