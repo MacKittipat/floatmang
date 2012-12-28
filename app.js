@@ -29,6 +29,11 @@ app.engine('html', ejs.__express); // Use ejs template engine.
 app.set('views', __dirname + '/view'); // Set view dir.
 app.set('view engine', 'html'); // Set view extension.
 app.use(express.static(__dirname + '/resource/js')); // Import all static file in /resource/js.
+app.use(express.static(__dirname + '/floatmang_design/assets'));
+//app.use(express.static(__dirname + '/floatmang_design/assets/css'));
+//app.use(express.static(__dirname + '/floatmang_design/assets/img'));
+//app.use(express.static(__dirname + '/floatmang_design/assets/js'));
+//app.use(express.static(__dirname + '/floatmang_design/assets/font'));
 app.use(express.bodyParser()); // Enable req.body.PARAMETER.
 app.use(express.cookieParser()); // Enable session.
 app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
