@@ -135,8 +135,38 @@ app.get('/idea', function(req, res) {
 })
 
 // Idea in animation mode.
-app.get('/idea/view', function(req, res) {
-    
+app.get('/float', function(req, res) {
+    if(loggedIn(req)) {
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbIdea, function(err, collection) {        
+                // Find idea by topic id.
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
+               cursorIdea.toArray(function(err, documents) {
+                   // Count all idea.
+                    collection.find().count(function(err, count) { 
+                        // Find topic by topicId.
+                        db.collection(tbTopic, function(err, collection) {
+                            collection.findOne({_id:new ObjectID(req.query.id)}, function(err, document) {
+                                res.render('float', {
+                                    documents:documents,
+                                    totalIdea:count,
+                                    topicId:req.query.id,
+                                    topic:document.topic,
+                                    appHost:appHost,
+                                    appPort:appPort,
+                                    limit:limit,
+                                    name:req.session.name
+                                });
+                            }); 
+
+                        });
+                    });
+               });
+            });    
+        });
+    } else {
+        res.redirect('/');
+    }
 });
 
 app.post('/a/moretopic', function(req, res) {
