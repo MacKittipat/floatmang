@@ -14,13 +14,14 @@
             socket.on('serverUpdateDislike', function(data) {
                 $("#btnDislike" + data.ideaId).html("Hate (" + data.dislike + ")");
             });
+            socket.on('serverUpdateAddIdea', function(data) {
+                $("#frmAddIdea #addIdea").val("");
+            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:data.like, dislike:data.dislike}).prependTo("#boxIdea");
+            });
             socket.on('serverUpdateEditIdea', function(data) {
                 $("#idea" + data.ideaId).html(data.idea); 
                 $("#frmEditIdea #ideaId").val("");
-                $("#frmEditIdea #idea").val("");
-            });
-            socket.on('servreSaveNewIdea', function(data) {
-            	$("#ideaTemplate").tmpl({ideaId:data.topicId, newIdea:data.newIdea}).prependTo("#boxIdea");
+                $("#frmEditIdea #editIdea").val("");
             });
             function like(ideaId) {
                 socket.emit('clientLikeIdea', {
@@ -35,7 +36,7 @@
             function edit(ideaId) {
                 $("#frmEditIdea #ideaId").val(ideaId);
                 $.post('/a/getidea', {ideaId:ideaId}, function(data) {
-                    $("#frmEditIdea #idea").val(data.idea);
+                    $("#frmEditIdea #editIdea").val(data.idea);
                 }, 'json');
             }
             $(document).ready(function() {
@@ -43,19 +44,27 @@
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
                         for(var key in data) {
-//                            $("#boxIdea").append("<div><span id='idea" + data[key]._id + "'>" + data[key].idea + "</span>&nbsp;&nbsp;" +
-//                            " <span><a id='btnLike" + data[key]._id + "' onclick='like(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].like + ")</a></span>" + 
-//                            " <span><a id='btnDislike" + data[key]._id + "' onclick='dislike(\"" + data[key]._id +"\");' href='javascript:void(0);'>Like (" + data[key].dislike + ")</a></span>" + 
-//                            " <span><a onclick='edit(\"" + data[key]._id + "\");' href='javascript:void(0);'>Edit</a></span>" + 
-//                            "</div>");
                             $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike}).appendTo("#boxIdea");
                         }
                         $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
                     }, 'json');
                 });         
+                $("#frmAddIdea").submit(function() {
+                    var topicId = $.trim($("#frmAddIdea #topicId").val());
+                    var name = $.trim($("#frmAddIdea #name").val());
+                    var idea = $.trim($("#frmAddIdea #addIdea").val());
+                    if(!topicId || !name || !idea) {
+                        return;
+                    }
+                    socket.emit('clientAddIdea', {
+                        topicId: topicId, 
+                        name:name,
+                        idea: idea
+                    }); 
+                });
                 $("#frmEditIdea").submit(function() {
                     var ideaId = $.trim($("#frmEditIdea #ideaId").val());
-                    var idea = $.trim($("#frmEditIdea #idea").val());
+                    var idea = $.trim($("#frmEditIdea #editIdea").val());
                     if(!ideaId || !idea) {
                         return;
                     }
@@ -63,15 +72,6 @@
                         ideaId: ideaId, 
                         idea: idea
                     }); 
-                });
-                $("#savenewidea").click(function() {
-                	var topicId = $("#topicId").val();
-                	var newIdea = $("#newidea").val();  
-                    socket.emit('saveNewIdea' , {
-                    	topicId : topicId,
-                    	newIdea: newIdea,
-                    	name: 'name'
-                    });
                 });
             });
         </script>
@@ -81,21 +81,27 @@
             Idea List
         </h2>
         <div>
-        	<div>
-        		New idea
-                <form id="newideaform">
+            <div>
+                <h3>
+                    New Idea
+                </h3>
+                <form id="frmAddIdea" onsubmit="return false;">
                     <div>
-                        <input type="text" id="newidea" value="" placeholder="put your idea"/>
                         <input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
-                        <input type="button" id=savenewidea value="put idea" />
+                        <input type="hidden" id="name" value="<%= name %>" />
+                        <input type="text" id="addIdea" value="" />
+                        <input type="submit" value="Add" />
                     </div>
                 </form>
             </div>
             <div>
+                <h3>
+                    Edit Idea
+                </h3>
                 <form id="frmEditIdea" onsubmit="return false;">
                     <div>
                         <input type="hidden" id="ideaId" value="" />
-                        <input type="text" id="idea" value="" />
+                        <input type="text" id="editIdea" value="" />
                         <input type="submit" value="Save" />
                     </div>
                 </form>
@@ -122,18 +128,6 @@
                 </div>            
                 <% } %>
             </div>
-            
-            <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
-                <div>
-                    <span id="idea${ideaId}">
-                        ${newIdea}
-                    </span>
-                    &nbsp;&nbsp;
-                    <span>                           
-                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like ('0')</a>
-                    </span>
-                    <span>                           
-                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate ('0')</a>
             <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
                 <div>
                     <span id="idea${ideaId}">
@@ -141,20 +135,17 @@
                     </span>
                     &nbsp;&nbsp;
                     <span>                           
-                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like (${like})</a>
+                        <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);">Like (0)</a>
                     </span>
                     <span>                           
-                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate (${dislike})</a>
+                        <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);">Hate (0)</a>
                     </span>
                     <span>
                         <a onclick="edit('${ideaId}');" href="javascript:void(0);">
                             Edit
                         </a>
                     </span>
-                </div>
-            </script>
-            
-                </div>   
+                </div>  
             </script>
             <% if(totalIdea > limit) {%>
             <div>

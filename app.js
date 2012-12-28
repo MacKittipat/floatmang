@@ -7,14 +7,12 @@ var routes = require('./routes');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = '192.168.51.102';
+var dbHost = '127.0.0.1';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
-var tbComment = "comment";
-var limitTopic = 2;
 var ObjectID = mongodb.ObjectID;
 var limit = 10;
 
@@ -215,11 +213,13 @@ io.sockets.on('connection', function (socket) {
     });   
     
     socket.on('clientEditTopic', function (data) {
-        console.log("[DEBUG] clientEditTopic, topic id : " + data.topicId + " | " + data.topic);
+        console.log("[DEBUG] clientEditTopic, topic id : " + data.topicId + ", topic :" + data.topic);
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbTopic, function(err, collection) {
+                console.log("EDIT1");
                 // Edit topic
                 collection.update({_id:new ObjectID(data.topicId)}, {$set:{topic:data.topic}}, {w:-1});
+                console.log("EDIT2");
                 // Update client.
                 socket.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
                 socket.broadcast.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
@@ -228,7 +228,7 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('clientEditIdea', function (data) {
-        console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId);
+        console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId + ", idea : " + data.idea);
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbIdea, function(err, collection) {
                 // Find idea by idea.
@@ -250,7 +250,6 @@ io.sockets.on('connection', function (socket) {
                     createby:data.name,
                     createtime:new Date().getTime()
                 }, {w:-1}, function(err, document) {
-                    console.log(document[0]._id +" " + data.topic);
                     // Update client.
                     socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
                     socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
@@ -259,23 +258,25 @@ io.sockets.on('connection', function (socket) {
         });
     });
     
-    socket.on('saveNewIdea', function(data) {
-    	console.log("saving new idea : "+ data.newIdea);
-    	console.log("topic id : "+data.topicId);
+    socket.on('clientAddIdea', function(data) {
+        console.log("[DEBUG] clientAddTopic, topicId : " + data.topicId + " | " + data.name + " | " + data.idea);
     	mongoClient.connect(dbUrl, function(err, db) { 
-    		db.collection(tbIdea, function( err, collection) {
-    			//add new idea base on topic
-    			collection.insert({
-    				idea: data.newIdea,
-    				createby : data.name,
-    				createtime:new Date().getTime(),
-    				topic_id:data.topicId
-    			}, {w:-1}, function(err, document) {
-    				console.log("updaing client");
-    				socket.emit('servreSaveNewIdea',{ideaId: document[0]._id, newIdea: data.newIdea});
-    				socket.broadcast.emit('servreSaveNewIdea',{topicId: data.topicId, newIdea: data.newIdea});
-    			});
-    		})
+            db.collection(tbIdea, function(err, collection) {
+                // Add new idea.
+                collection.insert({
+                        idea:data.idea,
+                        createby:data.name,
+                        createtime:new Date().getTime(),
+                        like:0,
+                        dislike:0,
+                        topic_id:new ObjectID(data.topicId)
+                }, {w:-1}, function(err, document) {
+                    console.log(document._id + " | " + document.idea);
+                    // Update client.
+                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea});
+                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea});
+                });
+            });
     	});
     });
 });

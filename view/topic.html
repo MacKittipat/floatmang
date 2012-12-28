@@ -9,20 +9,21 @@
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
-                $("#frmAddTopic #topic").val("");
+                $("#frmAddTopic #addTopic").val("");
                 $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic}).prependTo("#boxTopic");
                  // Remove last topic after add new one.
                 $("#boxTopic .rowTopic:last").remove();
             });
             socket.on('serverUpdateEditTopic', function(data) {
+                console.log("EDIT3 " + data.topicId + " | " + data.topic);
                 $("#topic" + data.topicId).html(data.topic); 
                 $("#frmEditTopic #topicId").val("");
-                $("#frmEditTopic #topic").val("");
+                $("#frmEditTopic #editTopic").val("");
             });
             function edit(topicId) {
                 $("#frmEditTopic #topicId").val(topicId);
                 $.post('/a/gettopic', {topicId:topicId}, function(data) {
-                    $("#frmEditTopic #topic").val(data.topic);
+                    $("#frmEditTopic #editTopic").val(data.topic);
                 }, 'json');
             }
             $(document).ready(function() {
@@ -37,7 +38,7 @@
                 });   
                 $("#frmAddTopic").submit(function() {
                     var name = $.trim($("#frmAddTopic #name").val());
-                    var topic = $.trim($("#frmAddTopic #topic").val());
+                    var topic = $.trim($("#frmAddTopic #addTopic").val());
                     if(!name || !topic) {
                         return;
                     }
@@ -48,10 +49,11 @@
                 });
                 $("#frmEditTopic").submit(function() {
                     var topicId = $.trim($("#frmEditTopic #topicId").val());
-                    var topic = $.trim($("#frmEditTopic #topic").val());
+                    var topic = $.trim($("#frmEditTopic #editTopic").val());
                     if(!topicId || !topic) {
                         return;
                     }
+                    console.log(topicId + " " + topic);
                     socket.emit('clientEditTopic', {
                         topicId: topicId, 
                         topic: topic
@@ -70,7 +72,7 @@
                 <form id="frmAddTopic" onsubmit="return false;">
                     <div>
                         <input type="hidden" id="name" value="<%= name %>" />
-                        <input type="text" id="topic" value="" />
+                        <input type="text" id="addTopic" value="" />
                         <input type="submit" value="Add" />
                     </div>
                 </form>
@@ -80,7 +82,7 @@
                 <form id="frmEditTopic" onsubmit="return false;">
                     <div>
                         <input type="hidden" id="topicId" value="" />
-                        <input type="text" id="topic" value="" />
+                        <input type="text" id="editTopic" value="" />
                         <input type="submit" value="Save" />
                     </div>
                 </form>
