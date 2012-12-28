@@ -140,7 +140,7 @@ app.get('/float', function(req, res) {
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbIdea, function(err, collection) {        
                 // Find idea by topic id.
-               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
+               var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:5}); 
                cursorIdea.toArray(function(err, documents) {
                    // Count all idea.
                     collection.find().count(function(err, count) { 
@@ -154,7 +154,7 @@ app.get('/float', function(req, res) {
                                     topic:document.topic,
                                     appHost:appHost,
                                     appPort:appPort,
-                                    limit:limit,
+                                    limit:5,
                                     name:req.session.name
                                 });
                             }); 

@@ -1,14 +1,205 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title></title>
+        <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="/font/gooddog-font.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.css" />
+        <link rel="stylesheet" type="text/css" href="/css/float.css" />
+        <style type="text/css">
+          body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+          }              
+        </style>
+        <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.js"></script>
+        <script type="text/javascript" src="/jqfloat.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
+            socket.on('serverUpdateLike', function(data) {
+                $("#btnLike" + data.ideaId).html("<i class='icon-thumbs-up'></i> " + data.like);
+            });
+            socket.on('serverUpdateDislike', function(data) {
+                $("#btnDislike" + data.ideaId).html("<i class='icon-thumbs-down'></i> " + data.dislike);
+            });
+            socket.on('serverUpdateAddIdea', function(data) {
+                $("#frmAddIdea #addIdea").val("");
+            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0'}).prependTo("#boxIdea");
+                 // Remove last idea after add new one.
+                 if($(".rowIdea").size() > <%= limit %>) {
+                    $("#boxIdea .rowIdea:last").remove();
+                 } else { // Add totalDisplayIdea if total idea < limit
+                     $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
+                 }               
+            });
+            socket.on('serverUpdateEditIdea', function(data) {
+                $("#idea" + data.ideaId).html(data.idea); 
+                $("#frmEditIdea #ideaId").val("");
+                $("#frmEditIdea #editIdea").val("");
+            });
+            function like(ideaId) {
+                socket.emit('clientLikeIdea', {
+                    ideaId: ideaId
+                });                
+            }
+            function dislike(ideaId) {
+                socket.emit('clientDislikeIdea', {
+                    ideaId: ideaId
+                }); 
+            }
+            function edit(ideaId) {
+                $("#frmEditIdea #ideaId").val(ideaId);
+                $.post('/a/getidea', {ideaId:ideaId}, function(data) {
+                    $("#frmEditIdea #editIdea").val(data.idea);
+                }, 'json');
+            }
+            $(document).ready(function() {
+                $('.float').jqFloat({speed: 5000});
+                $('.tooltips').tooltip();
+                $("#btnShowMore").click(function() {
+                    var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
+                    $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
+                        for(var key in data) {
+                            $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike}).appendTo("#boxIdea");
+                        }
+                        $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
+                    }, 'json');
+                });         
+                $("#frmAddIdea").submit(function() {
+                    var topicId = $.trim($("#frmAddIdea #topicId").val());
+                    var name = $.trim($("#frmAddIdea #name").val());
+                    var idea = $.trim($("#frmAddIdea #addIdea").val());
+                    if(!topicId || !name || !idea) {
+                        return;
+                    }
+                    socket.emit('clientAddIdea', {
+                        topicId: topicId, 
+                        name:name,
+                        idea: idea
+                    }); 
+                    $('#myModal').modal('hide')
+                });
+                $("#frmEditIdea").submit(function() {
+                    var ideaId = $.trim($("#frmEditIdea #ideaId").val());
+                    var idea = $.trim($("#frmEditIdea #editIdea").val());
+                    if(!ideaId || !idea) {
+                        return;
+                    }
+                    socket.emit('clientEditIdea', {
+                        ideaId: ideaId, 
+                        idea: idea
+                    }); 
+                    $('#myModal').modal('hide')
+                });
+            });
+        </script>
     </head>
+
     <body>
-        <div>TODO write content</div>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <img src="/img/float-logo.png" alt="Floatmang Logo" class="logo" />
+                    <a class="brand" href="/">FloatMang!</a>
+                    <div class="nav-collapse collapse">
+                        <div class="navbar-form pull-right">
+                            <ul class="nav">
+                                <!--<li><a href="/topic">View Topics</a></li>
+                                <li><a href="#about">About Us</a></li>-->
+                                <li><button href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                                    <i class="icon-plus icon-white"></i> New idea</button>&nbsp;</li>
+                                <li><button onclick="window.location.href='/idea?id=<%= topicId %>'" class="btn"><i class="icon-list"></i> List view</button>&nbsp;</li>
+                                <li>
+                                    <div class="btn-group">
+                                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <%= name %>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="/logout">Signout</a></li>
+                                        </ul>
+                                    </div>                                        
+                                </li>
+                                <li>&nbsp;<button onclick="window.location.href='/topic'" class="btn" data-toggle="modal"><i class="icon-home"></i></button></li>
+                            </ul> 
+                        </div>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal -->
+        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <form id="frmAddIdea" onsubmit="return false;">
+                <div class="modal-header">
+                    <input type="button" class="close" data-dismiss="modal" aria-hidden="true" value="x" />
+                    <h3 id="myModalLabel">Share your idea</h3>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
+                    <input type="hidden" id="name" value="<%= name %>" />
+                    <input class="input-block-level" type="text" id="addIdea" placeholder="Type your idea here">
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="Cancle" /> 
+                    <input type="submit" class="btn btn-primary" value="Share" />
+                </div> 
+            </form>
+        </div>
+        
+        
+        
+        <div class="container">
+            <div class="row">
+                <div class="span10 offset1  topic">
+                    <div class="span7"><h4><span class="leftq"></span><%= topic %><span class="rightq"></span></h4></div>
+                </div>
+            </div><br/><br/>
+            
+            <input type="hidden" id="totalDisplayIdea" value="<%=totalIdea%>" />
+            <div id="boxIdea">
+                <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
+                <% for(var key in documents) {%>
+                
+                
+                <div class="float"> 
+                    <blockquote class="example-right">
+                        <p><%= documents[key].idea  %></p>
+                    </blockquote>
+                    <p><%= documents[key].createby  %></p>
+                </div>
+            
+                <br/>
+                
+                
+                <% } %>
+                
+                <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
+                    <div class="row rowIdea">
+                        <div class="span10 offset1  list">
+                            <div class="span7" id="idea${ideaId}"><h5>${idea}</h5></div>
+                            <div class="span2">
+                                <h5>
+                                    <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> ${like}</a>
+                                    <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> ${dislike}</a>
+                                </h5>
+                            </div>
+                        </div>		
+                    </div>
+                </script>
+                
+            </div>
+        </div>
     </body>
 </html>
+
+
