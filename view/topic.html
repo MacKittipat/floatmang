@@ -17,11 +17,11 @@
         <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            $('.tooltips').tooltip();
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
                 $("#frmAddTopic #addTopic").val("");
-                $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic}).prependTo("#boxTopic");
+                $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic, createtime:data.createtime, createby:data.createby, prettytime:data.prettytime}).prependTo("#boxTopic");
+                $('.tooltips').tooltip();
                  // Remove last topic after add new one.
                  if($(".rowTopic").size() > <%= limit %>) {
                     $("#boxTopic .rowTopic:last").remove();
@@ -41,13 +41,15 @@
                 }, 'json');
             }
             $(document).ready(function() {
+                $('.tooltips').tooltip();
                 $("#btnShowMore").click(function() {
                     var totalDisplayTopic = parseInt($("#totalDisplayTopic").val());
                     $.post('/a/moretopic', {totalDisplayTopic:totalDisplayTopic}, function(data) {
                         for(var key in data) {
-                            $("#topicTemplate").tmpl({topicId:data[key]._id, topic:data[key].topic}).appendTo("#boxTopic");
+                            $("#topicTemplate").tmpl({topicId:data[key]._id, topic:data[key].topic, createby:data[key].createby, prettytime:data[key].prettytime}).appendTo("#boxTopic");
                         }
                         $("#totalDisplayTopic").val(totalDisplayTopic + data.length);
+                        $('.tooltips').tooltip();
                     }, 'json');
                 });   
                 $("#frmAddTopic").submit(function() {
@@ -143,13 +145,13 @@
                             <div class="span7">
                                 <h5>
                                     <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
-                                        <%= documents[key].topic  %>
+                                        <%= documents[key].topic  %> 
                                     </a>
                                 </h5>
                             </div>
                             <div class="span2"><h5>
-                                <a class="btn btn-mini tooltips" href="idea.html" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
-                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
+                                <a class="btn btn-mini tooltips" href="/idea/?id=<%= documents[key]._id %>" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
+                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Create by <%= documents[key].createby %> (<%= documents[key].prettytime %>)"><i class="icon-info-sign"></i></a></h5>
                             </div>
                         </div>
                     </div>
@@ -165,8 +167,8 @@
                                 </h5>
                             </div>
                             <div class="span2"><h5>
-                                <a class="btn btn-mini tooltips" href="idea.html" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
-                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
+                                <a class="btn btn-mini tooltips" href="/idea/?id=${topicId}" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
+                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Create by ${createby} (${prettytime})"><i class="icon-info-sign"></i></a></h5>
                             </div>
                         </div>
                     </div>

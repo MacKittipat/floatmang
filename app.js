@@ -2,7 +2,7 @@ var express = require('express');
 var ejs = require('ejs');
 var socketio = require('socket.io');
 var mongodb = require('mongodb');
-var routes = require('./routes');
+var humane = require('./lib/humane');
 
 // =============== Config
 var appHost = '127.0.0.1';
@@ -76,6 +76,10 @@ app.get('/topic', function(req, res) {
                 // Find topic.
                 var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:0, limit:limit}); 
                 cursorTopic.toArray(function(err, documents) { 
+                    // Extend document field.
+                    for(var key in documents) {
+                        documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
+                    }
                     // Count all topic.
                     collection.find().count(function(err, count) { 
                         res.render('topic', {
@@ -124,7 +128,7 @@ app.get('/idea', function(req, res) {
 })
 
 // Idea in animation mode.
-app.get('/idea', function(req, res) {
+app.get('/idea/view', function(req, res) {
     
 });
 
@@ -134,6 +138,10 @@ app.post('/a/moretopic', function(req, res) {
             // Find topic.
             var cursorTopic = collection.find({}, {sort:{createtime:-1}, skip:req.body.totalDisplayTopic, limit:limit}); 
             cursorTopic.toArray(function(err, documents) { 
+                // Extend document field.
+                for(var key in documents) {
+                    documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
+                }
                 // Return topic as JSON. 
                 res.json(documents);   
             });
@@ -252,9 +260,11 @@ io.sockets.on('connection', function (socket) {
                     createby:data.name,
                     createtime:new Date().getTime()
                 }, {w:-1}, function(err, document) {
+                    // Extend document field.
+                    document[0].prettytime = humane.humaneDate(new Date(document[0].createtime));
                     // Update client.
-                    socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
-                    socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic});
+                    socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic, createtime:document[0].createtime, createby:document[0].createby, prettytime:document[0].prettytime});
+                    socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic, createtime:document[0].createtime, createby:document[0].createby, prettytime:document[0].prettytime});
                 });
             });
         });
