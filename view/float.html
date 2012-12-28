@@ -19,7 +19,7 @@
         <script type="text/javascript" src="/jqfloat.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
+            var socket = io.connect();
             socket.on('serverUpdateLike', function(data) {
                 $("#btnLike" + data.ideaId).html("<i class='icon-thumbs-up'></i> " + data.like);
             });

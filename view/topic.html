@@ -17,7 +17,7 @@
         <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
+            var socket = io.connect();
             socket.on('serverUpdateAddTopic', function(data) {
                 $("#frmAddTopic #addTopic").val("");
                 $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic, createtime:data.createtime, createby:data.createby, prettytime:data.prettytime}).prependTo("#boxTopic");
