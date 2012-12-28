@@ -28,8 +28,8 @@
                 $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0'}).prependTo("#boxIdea");
                  // Remove last idea after add new one.
-                 if($(".row").size() > <%= limit %>) {
-                    $("#boxIdea .row:last").remove();
+                 if($(".rowIdea").size() > <%= limit %>) {
+                    $("#boxIdea .rowIdea:last").remove();
                  } else { // Add totalDisplayIdea if total idea < limit
                      $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
                  }               
@@ -59,7 +59,6 @@
                 $('.tooltips').tooltip();
                 $("#btnShowMore").click(function() {
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
-                    console.log(">> " + totalDisplayIdea);
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
                         for(var key in data) {
                             $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike}).appendTo("#boxIdea");
@@ -162,8 +161,9 @@
             </div>
             
             <div id="boxIdea">
+                <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
                 <% for(var key in documents) {%>
-                <div class="row">
+                <div class="row rowIdea">
                     <div class="span10 offset1  list">
                         <div class="span7" id="idea<%= documents[key]._id  %>"><h5><%= documents[key].idea  %></h5></div>
                         <div class="span2">
@@ -176,7 +176,7 @@
                 </div>
                 <% } %>
                 <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
-                    <div class="row">
+                    <div class="row rowIdea">
                         <div class="span10 offset1  list">
                             <div class="span7" id="idea${ideaId}"><h5>${idea}</h5></div>
                             <div class="span2">
