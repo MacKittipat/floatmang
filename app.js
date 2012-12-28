@@ -116,7 +116,8 @@ app.get('/idea', function(req, res) {
                             appHost:appHost,
                             appPort:appPort,
                             limit:limit,
-                            name:req.session.name
+                            name:req.session.name,
+                            topic: req.query.topic
                         });
                     });
                });
