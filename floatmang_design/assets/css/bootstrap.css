@@ -284,9 +284,15 @@ a:hover {
 .test:after {
   clear: both;
 }
+/*
 .topic {background: black; border: 1px solid #003384; border-radius: 5px;}
 .list {background: #f0fdff; border: 1px solid #c7f7ff; border-radius: 5px;}
-.list:hover {background: #e3fbff; border: 1px solid #00d9ff; border-radius: 5px;}
+.list:hover {background: #e3fbff; border: 1px solid #00d9ff; border-radius: 5px;}*/
+
+
+.topic {background: #f0fdff; border: 1px solid #c7f7ff; border-radius: 5px;}
+.list {background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 5px;}
+.list:hover {background: #f0f0f0; border: 1px solid #e0e0e0; border-radius: 5px;}
 
 .row:after {
   clear: both;
@@ -304,6 +310,8 @@ a:hover {
 .navbar-fixed-bottom .container {
   width: 940px;
 }
+
+.span13 {width: 900px; margin-left: 100px !important; }
 
 .span12 {
   width: 940px;
@@ -4407,7 +4415,7 @@ input[type="submit"].btn.btn-mini {
   float: left;
   padding: 10px 20px 10px;
   margin-left: -20px;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 200;
   color: #777777;
   text-shadow: 0 1px 0 #ffffff;
