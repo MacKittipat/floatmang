@@ -3,10 +3,21 @@
     <head>
         <title>FloatMang</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="/font/gooddog-font.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.css" />
+        <style type="text/css">
+          body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+          }              
+        </style>
         <script type="text/javascript" src="/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
+            $('.tooltips').tooltip();
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
                 $("#frmAddTopic #addTopic").val("");
@@ -49,6 +60,7 @@
                         name: name, 
                         topic: topic
                     }); 
+                    $('#myModal').modal('hide')
                 });
                 $("#frmEditTopic").submit(function() {
                     var topicId = $.trim($("#frmEditTopic #topicId").val());
@@ -65,55 +77,102 @@
         </script>
     </head>
     <body>        
-        <h2>
-            Topic
-        </h2>
-        <div>           
-            <div>
-                <h3>New Topic</h3>
-                <form id="frmAddTopic" onsubmit="return false;">
-                    <div>
-                        <input type="hidden" id="name" value="<%= name %>" />
-                        <input type="text" id="addTopic" value="" />
-                        <input type="submit" value="Add" />
-                    </div>
-                </form>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <img src="/img/float-logo.png" alt="Floatmang Logo" class="logo" />
+                    <a class="brand" href="/">FloatMang!</a>
+                    <div class="nav-collapse collapse">
+                        <div class="navbar-form pull-right">
+                            <ul class="nav">
+                                <li><a href="/topic">View Topics</a></li>
+                                <li><a href="#about">About Us</a></li>
+                                <li>
+                                    <div class="btn-group">
+                                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <%= name %>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="/logout">Signout</a></li>
+                                        </ul>
+                                    </div>                                        
+                                </li>
+                            </ul> 
+                        </div>
+                    </div><!--/.nav-collapse -->
+                </div>
             </div>
-            <div>
-                <h3>Edit Topic</h3>
-                <form id="frmEditTopic" onsubmit="return false;">
-                    <div>
-                        <input type="hidden" id="topicId" value="" />
-                        <input type="text" id="editTopic" value="" />
-                        <input type="submit" value="Save" />
+        </div>
+        
+        <div class="container">
+            <div class="row">
+                <div class="span10 offset1 topic">
+                    <div class="span7"><h4><span class="leftq"></span>What are they talking about?<span class="rightq"></span></h4></div>
+                    <div class="span2"><h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New topic</a></h4></div>
+                    <!-- Modal -->
+                    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <form id="frmAddTopic" onsubmit="return false;">
+                            <div class="modal-header">
+                                <input type="button" class="close" data-dismiss="modal" aria-hidden="true" value="x" /> 
+                                <h3 id="myModalLabel">Start new topic</h3>
+                            </div>
+                            <div class="modal-body">
+                                    <input type="hidden" id="name" value="<%= name %>" />
+                                    <input class="input-block-level" type="text" id="addTopic" placeholder="Type your topic here">
+                            </div>
+                            <div class="modal-footer">
+                                <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="Cancle" /> 
+                                <input type="submit" value="Start" class="btn btn-primary" />
+                            </div> 
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
-            <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
+            
             <div id="boxTopic">
+                <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
                 <% for(var key in documents) {%>
-                <div class="rowTopic">
-                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
-                        <%= documents[key].topic  %>
-                    </a>
-                    &nbsp;&nbsp;
-                    <a onclick="edit('<%= documents[key]._id  %>');" href="javascript:void(0);">
-                        Edit
-                    </a>
-                </div>
+                    <div class="row rowTopic">
+                        <div class="span10 offset1 list">
+                            <div class="span7">
+                                <h5>
+                                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
+                                        <%= documents[key].topic  %>
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="span2"><h5>
+                                <a class="btn btn-mini tooltips" href="idea.html" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
+                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
+                            </div>
+                        </div>
+                    </div>
                 <% } %>
+                <script id="topicTemplate" type="text/x-jquery-tmpl">                 
+                    <div class="row rowTopic">
+                        <div class="span10 offset1 list">
+                            <div class="span7">
+                                <h5>
+                                    <a id="topic${topicId}" href="/idea/?id=${topicId}">
+                                        ${topic}
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="span2"><h5>
+                                <a class="btn btn-mini tooltips" href="idea.html" rel="tooltip" data-placement="top" title="Ideas shared on this topic"><i class="icon-comment"></i> 23</a>
+                                <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Started by System (2012.12.25)"><i class="icon-info-sign"></i></a></h5>
+                            </div>
+                        </div>
+                    </div>
+                </script>
             </div>
-            <script id="topicTemplate" type="text/x-jquery-tmpl"> 
-                <div class="rowTopic">
-                    <a id="topic${topicId}" href="/idea/?id=${topicId}">
-                        ${topic}
-                    </a>
-                    &nbsp;&nbsp;
-                    <a onclick="edit('${topicId}');" href="javascript:void(0);">
-                        Edit
-                    </a>
-                </div>
-            </script>
+            
             <% if(totalTopic > limit) {%>
             <div>
                 <a id="btnShowMore" href="javascript:void(0);">
@@ -121,6 +180,6 @@
                 </a>
             </div>
             <% } %>
-        </div>
+        </div> <!-- /container -->
     </body>
 </html>
