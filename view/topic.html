@@ -144,7 +144,7 @@
                         <div class="span10 offset1 list">
                             <div class="span7">
                                 <h5>
-                                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
+                                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>&topic=<%=documents[key].topic %>">
                                         <%= documents[key].topic  %> 
                                     </a>
                                 </h5>
@@ -161,7 +161,7 @@
                         <div class="span10 offset1 list">
                             <div class="span7">
                                 <h5>
-                                    <a id="topic${topicId}" href="/idea/?id=${topicId}">
+                                    <a id="topic${topicId}" href="/idea/?id=${topicId}&topic=${topic}">
                                         ${topic}
                                     </a>
                                 </h5>

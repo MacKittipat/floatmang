@@ -109,6 +109,7 @@ app.get('/idea', function(req, res) {
                cursorIdea.toArray(function(err, documents) {
                    // Count all idea.
                     collection.find().count(function(err, count) { 
+<<<<<<< HEAD
                         // Find topic by topicId.
                         db.collection(tbTopic, function(err, collection) {
                             collection.findOne({_id:new ObjectID(req.query.id)}, function(err, document) {
@@ -123,6 +124,17 @@ app.get('/idea', function(req, res) {
                                     name:req.session.name
                                 });
                             }); 
+=======
+                        res.render('idea', {
+                            documents:documents,
+                            totalIdea:count,
+                            topicId:req.query.id,
+                            appHost:appHost,
+                            appPort:appPort,
+                            limit:limit,
+                            name:req.session.name,
+                            topic: req.query.topic
+>>>>>>> 14b1bb3f91bed871ca84246a929515b6b835be43
                         });
                     });
                });
