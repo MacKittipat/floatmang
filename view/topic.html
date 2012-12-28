@@ -92,8 +92,9 @@
                     <div class="nav-collapse collapse">
                         <div class="navbar-form pull-right">
                             <ul class="nav">
-                                <li><a href="/topic">View Topics</a></li>
-                                <li><a href="#about">About Us</a></li>
+                                <!--<li><a href="/topic">View Topics</a></li>
+                                <li><a href="#about">About Us</a></li>-->
+                                <li><button href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New topic</button>&nbsp;</li>
                                 <li>
                                     <div class="btn-group">
                                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -112,30 +113,26 @@
             </div>
         </div>
         
-        <div class="container">
-            <div class="row">
-                <div class="span10 offset1 topic">
-                    <div class="span7"><h4><span class="leftq"></span>What are they talking about?<span class="rightq"></span></h4></div>
-                    <div class="span2"><h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New topic</a></h4></div>
-                    <!-- Modal -->
-                    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <form id="frmAddTopic" onsubmit="return false;">
-                            <div class="modal-header">
-                                <input type="button" class="close" data-dismiss="modal" aria-hidden="true" value="x" /> 
-                                <h3 id="myModalLabel">Start new topic</h3>
-                            </div>
-                            <div class="modal-body">
-                                    <input type="hidden" id="name" value="<%= name %>" />
-                                    <input class="input-block-level" type="text" id="addTopic" placeholder="Type your topic here">
-                            </div>
-                            <div class="modal-footer">
-                                <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="Cancle" /> 
-                                <input type="submit" value="Start" class="btn btn-primary" />
-                            </div> 
-                        </form>
-                    </div>
+        <!-- Modal -->
+        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <form id="frmAddTopic" onsubmit="return false;">
+                <div class="modal-header">
+                    <input type="button" class="close" data-dismiss="modal" aria-hidden="true" value="x" /> 
+                    <h3 id="myModalLabel">Start new topic</h3>
                 </div>
-            </div>
+                <div class="modal-body">
+                        <input type="hidden" id="name" value="<%= name %>" />
+                        <input class="input-block-level" type="text" id="addTopic" placeholder="Type your topic here">
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn" data-dismiss="modal" aria-hidden="true" value="Cancle" /> 
+                    <input type="submit" value="Start" class="btn btn-primary" />
+                </div> 
+            </form>
+        </div>
+        
+        
+        <div class="container">
             
             <div id="boxTopic">
                 <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
@@ -154,8 +151,9 @@
                                 <a class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Create by <%= documents[key].createby %> (<%= documents[key].prettytime %>)"><i class="icon-info-sign"></i></a></h5>
                             </div>
                         </div>
+                        <div class="span1">&nbsp;</div>
                     </div>
-                <% } %>
+                        <% } %>
                 <script id="topicTemplate" type="text/x-jquery-tmpl">                 
                     <div class="row rowTopic">
                         <div class="span10 offset1 list">
@@ -176,10 +174,12 @@
             </div>
             
             <% if(totalTopic > limit) {%>
-            <div>
-                <a id="btnShowMore" href="javascript:void(0);">
-                    Show More
-                </a>
+            <div class="row">
+                <div class="span3 offset9">
+                    <a class="btn btn-info" id="btnShowMore" href="javascript:void(0);">
+                        Show More
+                    </a>
+                </div>
             </div>
             <% } %>
         </div> <!-- /container -->
