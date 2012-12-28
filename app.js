@@ -14,7 +14,7 @@ var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var ObjectID = mongodb.ObjectID;
-var limit = 10;
+var limit = 3;
 
 // =============== Web App Global Var 
 var app = express();
@@ -62,7 +62,6 @@ app.get('/logout', function(req, res) {
     req.session.destroy();
     res.redirect('login');
 });
-
 
 app.get('/topic', function(req, res) {
     if(loggedIn(req)) {
@@ -216,10 +215,8 @@ io.sockets.on('connection', function (socket) {
         console.log("[DEBUG] clientEditTopic, topic id : " + data.topicId + ", topic :" + data.topic);
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbTopic, function(err, collection) {
-                console.log("EDIT1");
                 // Edit topic
                 collection.update({_id:new ObjectID(data.topicId)}, {$set:{topic:data.topic}}, {w:-1});
-                console.log("EDIT2");
                 // Update client.
                 socket.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
                 socket.broadcast.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});

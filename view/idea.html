@@ -17,6 +17,12 @@
             socket.on('serverUpdateAddIdea', function(data) {
                 $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:data.like, dislike:data.dislike}).prependTo("#boxIdea");
+                 // Remove last idea after add new one.
+                 if($(".rowIdea").size() > <%= limit %>) {
+                    $("#boxIdea .rowIdea:last").remove();
+                 } else { // Add totalDisplayIdea if total idea < limit
+                     $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
+                 }               
             });
             socket.on('serverUpdateEditIdea', function(data) {
                 $("#idea" + data.ideaId).html(data.idea); 
@@ -42,6 +48,7 @@
             $(document).ready(function() {
                 $("#btnShowMore").click(function() {
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
+                    console.log(">> " + totalDisplayIdea);
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
                         for(var key in data) {
                             $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike}).appendTo("#boxIdea");
@@ -109,7 +116,7 @@
             <input type="hidden" id="totalDisplayIdea" value="<%= documents.length  %>" />
             <div id="boxIdea">
                 <% for(var key in documents) {%>
-                <div>
+                <div class="rowIdea">
                     <span id="idea<%= documents[key]._id  %>">
                         <%= documents[key].idea  %>
                     </span>
@@ -129,7 +136,7 @@
                 <% } %>
             </div>
             <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
-                <div>
+                <div class="rowIdea">
                     <span id="idea${ideaId}">
                         ${idea}
                     </span>
