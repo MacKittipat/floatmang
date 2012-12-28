@@ -9,20 +9,24 @@
         <script type="text/javascript">
             var socket = io.connect('http://<%= appHost %>:<%= appPort %>');
             socket.on('serverUpdateAddTopic', function(data) {
-                $("#frmAddTopic #topic").val("");
+                $("#frmAddTopic #addTopic").val("");
                 $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic}).prependTo("#boxTopic");
+                 // Remove last topic after add new one.
+                 if($(".rowTopic").size() > <%= limit %>) {
+                    $("#boxTopic .rowTopic:last").remove();
+                 } else { // Add totalDisplayTopic if total topic < limit
+                     $("#totalDisplayTopic").val(parseInt($("#totalDisplayTopic").val()) + 1);
+                 }                
             });
             socket.on('serverUpdateEditTopic', function(data) {
-                console.log(data.topicId + " | " + data.topic);
                 $("#topic" + data.topicId).html(data.topic); 
                 $("#frmEditTopic #topicId").val("");
-                $("#frmEditTopic #topic").val("");
+                $("#frmEditTopic #editTopic").val("");
             });
             function edit(topicId) {
                 $("#frmEditTopic #topicId").val(topicId);
                 $.post('/a/gettopic', {topicId:topicId}, function(data) {
-                    console.log(data.topic);
-                    $("#frmEditTopic #topic").val(data.topic);
+                    $("#frmEditTopic #editTopic").val(data.topic);
                 }, 'json');
             }
             $(document).ready(function() {
@@ -37,7 +41,7 @@
                 });   
                 $("#frmAddTopic").submit(function() {
                     var name = $.trim($("#frmAddTopic #name").val());
-                    var topic = $.trim($("#frmAddTopic #topic").val());
+                    var topic = $.trim($("#frmAddTopic #addTopic").val());
                     if(!name || !topic) {
                         return;
                     }
@@ -48,7 +52,7 @@
                 });
                 $("#frmEditTopic").submit(function() {
                     var topicId = $.trim($("#frmEditTopic #topicId").val());
-                    var topic = $.trim($("#frmEditTopic #topic").val());
+                    var topic = $.trim($("#frmEditTopic #editTopic").val());
                     if(!topicId || !topic) {
                         return;
                     }
@@ -70,7 +74,7 @@
                 <form id="frmAddTopic" onsubmit="return false;">
                     <div>
                         <input type="hidden" id="name" value="<%= name %>" />
-                        <input type="text" id="topic" value="" />
+                        <input type="text" id="addTopic" value="" />
                         <input type="submit" value="Add" />
                     </div>
                 </form>
@@ -80,7 +84,7 @@
                 <form id="frmEditTopic" onsubmit="return false;">
                     <div>
                         <input type="hidden" id="topicId" value="" />
-                        <input type="text" id="topic" value="" />
+                        <input type="text" id="editTopic" value="" />
                         <input type="submit" value="Save" />
                     </div>
                 </form>
@@ -88,8 +92,8 @@
             <input type="hidden" id="totalDisplayTopic" value="<%= documents.length  %>" />
             <div id="boxTopic">
                 <% for(var key in documents) {%>
-                <div>
-                    <a id="topic<%= documents[key]._id %>" href="/idea/list/?id=<%= documents[key]._id %>">
+                <div class="rowTopic">
+                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
                         <%= documents[key].topic  %>
                     </a>
                     &nbsp;&nbsp;
@@ -100,8 +104,8 @@
                 <% } %>
             </div>
             <script id="topicTemplate" type="text/x-jquery-tmpl"> 
-                <div>
-                    <a id="topic${topicId}" href="/idea/list/?id=${topicId}">
+                <div class="rowTopic">
+                    <a id="topic${topicId}" href="/idea/?id=${topicId}">
                         ${topic}
                     </a>
                     &nbsp;&nbsp;
