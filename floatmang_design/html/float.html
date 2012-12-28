@@ -50,6 +50,7 @@
              <div class="navbar-form pull-right">
              <ul class="nav">
                 <li><a href="topic.html">View Topics</a></li>
+                <li><a href="#about">About Us</a></li>
                 <li>
                     <div class="btn-group">
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -57,8 +58,7 @@
                     <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#about">About Us</a></li>
-                        <li class="divider"></li>
+                        
                         <li><a href="#about">Signout</a></li>
                     </ul>
                     </div>
@@ -76,29 +76,32 @@
         
         
         <div class="row">
-          <div class="span13 topic">
-          <div class="span7"><h4><span class="leftq"></span>What is your favorite quote?<span class="rightq"></span></h4></div>
-          <div class="span2"><h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New idea</a></h4></div>
+          <div class="span10 offset1  topic">
+            <div class="span7"><h4><span class="leftq"></span>Where should we go for the next company trip?<span class="rightq"></span></h4></div>
+              <div class="span2">
+                  <h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                    <i class="icon-plus icon-white"></i> New idea</a>
+                    <a href="floatidea.html" class="btn">
+                        <img src="../assets/img/float-icon.gif" alt="" border="1" /></a></h4>
+              </div>
 
-        <!-- Modal -->
-        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Share your idea</h3>
+            <!-- Modal -->
+            <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel">Share your idea</h3>
+              </div>
+              <div class="modal-body">
+                  <form>
+                    <input class="input-block-level" type="text" id="inputIdea" placeholder="Type your idea here">
+                  </form>
+              </div>
+              <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                <button class="btn btn-primary">Share</button>
+              </div> 
+            </div>
           </div>
-          <div class="modal-body">
-              <form>
-                <input class="input-block-level" type="text" id="inputIdea" placeholder="Type your idea here">
-              </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button class="btn btn-primary">Share</button>
-          </div> 
-        </div>
-          </div>
-        
-        
       </div><br/><br/><br/>
         
         
