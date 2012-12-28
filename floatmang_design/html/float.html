@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>FloatMang! &middot; Twitter Bootstrap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="../assets/css/float.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+      }
+
+    </style>
+    <link rel="stylesheet" href="stylesheet.css" type="text/css" charset="utf-8">
+    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+                    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+                                   <link rel="shortcut icon" href="../assets/ico/favicon.png">
+  </head>
+
+  <body>
+
+   <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <img src="../assets/img/float-logo.png" alt="Floatmang Logo" class="logo" />
+            <a class="brand" href="topic.html">FloatMang!</a>
+          <div class="nav-collapse collapse">
+             <div class="navbar-form pull-right">
+             <ul class="nav">
+                <li><a href="topic.html">View Topics</a></li>
+                <li>
+                    <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    Username
+                    <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#about">About Us</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#about">Signout</a></li>
+                    </ul>
+                    </div>
+                    
+                </li>
+             </ul> 
+            </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+        
+        
+        <div class="row">
+          <div class="span13 topic">
+          <div class="span7"><h4><span class="leftq"></span>What is your favorite quote?<span class="rightq"></span></h4></div>
+          <div class="span2"><h4><a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus icon-white"></i> New idea</a></h4></div>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Share your idea</h3>
+          </div>
+          <div class="modal-body">
+              <form>
+                <input class="input-block-level" type="text" id="inputIdea" placeholder="Type your idea here">
+              </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button class="btn btn-primary">Share</button>
+          </div> 
+        </div>
+          </div>
+        
+        
+      </div><br/><br/><br/>
+        
+        
+
+        <div id="test"> 
+            <blockquote class="example-right">
+                    <p>Design is directed toward human beings. To design is to solve human problems by identifying them and executing the best solution.</p>
+            </blockquote>
+            <p>Ivan Chermayeff</p>
+        </div>
+    
+      <br/>
+        
+        <div id="test2"> 
+            <blockquote class="example-right">
+                    <p>It's not what you look at that matters, it's what you see.</p>
+            </blockquote>
+            <p>Henry David Thoreau</p>
+        </div>
+      
+       <div id="test3"> 
+            <blockquote class="example-right">
+                    <p>EXPLORE. DREAM. DISCOVER.</p>
+            </blockquote>
+            <p>P.Vechprasit</p>
+        </div>
+    
+        
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/js/bootstrap.js"></script>
+    <script src="../assets/js/jqfloat.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#test').jqFloat({speed: 5000});
+            $('#test2').jqFloat({speed: 5000});
+            $('#test3').jqFloat({speed: 5000});
+         });
+        
+    </script>
+
+  </body>
+</html>
+
+
