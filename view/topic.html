@@ -15,7 +15,6 @@
                 $("#boxTopic .rowTopic:last").remove();
             });
             socket.on('serverUpdateEditTopic', function(data) {
-                console.log(data.topicId + " | " + data.topic);
                 $("#topic" + data.topicId).html(data.topic); 
                 $("#frmEditTopic #topicId").val("");
                 $("#frmEditTopic #topic").val("");
@@ -23,7 +22,6 @@
             function edit(topicId) {
                 $("#frmEditTopic #topicId").val(topicId);
                 $.post('/a/gettopic', {topicId:topicId}, function(data) {
-                    console.log(data.topic);
                     $("#frmEditTopic #topic").val(data.topic);
                 }, 'json');
             }
@@ -91,7 +89,7 @@
             <div id="boxTopic">
                 <% for(var key in documents) {%>
                 <div class="rowTopic">
-                    <a id="topic<%= documents[key]._id %>" href="/idea/list/?id=<%= documents[key]._id %>">
+                    <a id="topic<%= documents[key]._id %>" href="/idea/?id=<%= documents[key]._id %>">
                         <%= documents[key].topic  %>
                     </a>
                     &nbsp;&nbsp;
@@ -103,7 +101,7 @@
             </div>
             <script id="topicTemplate" type="text/x-jquery-tmpl"> 
                 <div class="rowTopic">
-                    <a id="topic${topicId}" href="/idea/list/?id=${topicId}">
+                    <a id="topic${topicId}" href="/idea/?id=${topicId}">
                         ${topic}
                     </a>
                     &nbsp;&nbsp;

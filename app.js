@@ -93,49 +93,8 @@ app.get('/topic', function(req, res) {
     }
 });
 
-///Show Topic To Edit
-app.get('/topic/edit',function(req,res){
-  
-    //req.boby.id
-     if(loggedIn(req)){
-          //Display Topic To Edit
-          mongoClient.connect(dbUrl,function(err,db){
-              db.collection(tbTopic,function(err,collection){
-                   var obj_id = BSON.ObjectID.createFromHexString(req.query.id);
-                //  var cursorTopic = collection.find({_id : obj_id});
-                      collection.findOne({_id : obj_id}, function(err, documents) {
-                      console.log(req.query.id)
-                       res.render('editTopic',{
-                           documents:documents 
-                       });
-                  });
-              })
-          })
-     }
-})
-
-//Update Edit Topic
-app.post('/updatetopic', function(req, res) {
-       
-        var editTopic = req.body.edittopic;
-        var createBy = req.session.name;
-        console.log("edittopic : "+ editTopic);
-        console.log("createBy : " + createBy);
-    
-        // insert data
-        mongoClient.connect(dbUrl, function(err, db) {
-                db.collection(tbTopic, function(err, collection) {
-                        collection.insert({
-                                topic: newTopic,
-                                createby: username,
-                                createtime:new Date().getTime()
-                        }, {w:-1});
-                });
-        });
-});
-
 // Idea in list mode.
-app.get('/idea/list', function(req, res) {
+app.get('/idea', function(req, res) {
     if(loggedIn(req)) {
         mongoClient.connect(dbUrl, function(err, db) { 
             db.collection(tbIdea, function(err, collection) {        
@@ -144,7 +103,7 @@ app.get('/idea/list', function(req, res) {
                cursorIdea.toArray(function(err, documents) {
                    // Count all idea.
                     collection.find().count(function(err, count) { 
-                        res.render('idealist', {
+                        res.render('idea', {
                             documents:documents,
                             totalIdea:count,
                             topicId:req.query.id,
@@ -165,17 +124,6 @@ app.get('/idea/list', function(req, res) {
 // Idea in animation mode.
 app.get('/idea', function(req, res) {
     
-});
-
-//request new idea page
-app.get('/newidea', function(req, res) {
-	console.log("returning new topicpage");
-	res.render('newidea');
-});
-
-//save new idea
-app.post('/newidea', function(req, res) {
-	console.log("saving new idea of topic : ");	
 });
 
 app.post('/a/moretopic', function(req, res) {
@@ -204,6 +152,18 @@ app.post('/a/moreidea', function(req, res) {
     });
 });
 
+app.post('/a/gettopic', function(req, res) {
+    mongoClient.connect(dbUrl, function(err, db) { 
+        db.collection(tbTopic, function(err, collection) {
+            // Find topic by topicId.
+            collection.findOne({_id:new ObjectID(req.body.topicId)}, function(err, document) {
+                // Return topic as JSON. 
+                res.json(document);  
+            }); 
+        });
+    });
+});
+
 app.post('/a/getidea', function(req, res) {
     mongoClient.connect(dbUrl, function(err, db) { 
         db.collection(tbIdea, function(err, collection) {
@@ -214,14 +174,6 @@ app.post('/a/getidea', function(req, res) {
             }); 
         });
     });
-});
-
-app.get('/test', function(req, res) {
-    res.render('test');
-});
-
-app.get('/json', function(req, res) {
-    res.json({a:1});
 });
 
 console.log('App is running : http://localhost:' + appPort);
@@ -261,6 +213,19 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });   
+    
+    socket.on('clientEditTopic', function (data) {
+        console.log("[DEBUG] clientEditTopic, topic id : " + data.topicId + " | " + data.topic);
+        mongoClient.connect(dbUrl, function(err, db) { 
+            db.collection(tbTopic, function(err, collection) {
+                // Edit topic
+                collection.update({_id:new ObjectID(data.topicId)}, {$set:{topic:data.topic}}, {w:-1});
+                // Update client.
+                socket.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
+                socket.broadcast.emit('serverUpdateEditTopic', {topicId:data.topicId, topic:data.topic});
+            });
+        });
+    });
     
     socket.on('clientEditIdea', function (data) {
         console.log("[DEBUG] clientEditIdea, idea id : " + data.ideaId);
