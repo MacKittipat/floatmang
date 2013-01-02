@@ -28,10 +28,11 @@
             });
             socket.on('serverUpdateAddIdea', function(data) {
                 $("#frmAddIdea #addIdea").val("");
-            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0'}).prependTo("#boxIdea");
+            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0', createby:data.createby}).prependTo("#boxIdea");
+                $('.float').jqFloat({speed: 5000});
                  // Remove last idea after add new one.
-                 if($(".rowIdea").size() > <%= limit %>) {
-                    $("#boxIdea .rowIdea:last").remove();
+                 if($(".float").size() > <%= limit %>) {
+                    $(".float:last").remove();
                  } else { // Add totalDisplayIdea if total idea < limit
                      $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
                  }               
@@ -183,17 +184,12 @@
                 
                 <% } %>
                 
-                <script id="ideaTemplate" type="text/x-jquery-tmpl"> 
-                    <div class="row rowIdea">
-                        <div class="span10 offset1  list">
-                            <div class="span7" id="idea${ideaId}"><h5>${idea}</h5></div>
-                            <div class="span2">
-                                <h5>
-                                    <a id="btnLike${ideaId}" onclick="like('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Like this idea"><i class="icon-thumbs-up"></i> ${like}</a>
-                                    <a id="btnDislike${ideaId}" onclick="dislike('${ideaId}');" href="javascript:void(0);" class="btn btn-mini tooltips" href="#" rel="tooltip" data-placement="top" title="Don't like this idea"><i class="icon-thumbs-down"></i> ${dislike}</a>
-                                </h5>
-                            </div>
-                        </div>		
+                <script id="ideaTemplate" type="text/x-jquery-tmpl">                    
+                    <div class="float"> 
+                        <blockquote class="example-right">
+                            <p>${idea}</p>
+                        </blockquote>
+                        <p>${createby}</p>
                     </div>
                 </script>
                 

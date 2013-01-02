@@ -320,10 +320,9 @@ io.sockets.on('connection', function (socket) {
                         dislike:0,
                         topic_id:new ObjectID(data.topicId)
                 }, {w:-1}, function(err, document) {
-                    console.log(document._id + " | " + document.idea);
                     // Update client.
-                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea});
-                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea});
+                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby});
+                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby});
                 });
             });
     	});
