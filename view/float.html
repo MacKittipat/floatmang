@@ -59,7 +59,9 @@
                 }, 'json');
             }
             $(document).ready(function() {
-                $('.float').jqFloat({speed: 5000});
+                if($(".float").size() > 0) {
+                    $('.float').jqFloat({speed: 5000});
+                }                
                 $('.tooltips').tooltip();
                 $("#btnShowMore").click(function() {
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
