@@ -321,8 +321,8 @@ io.sockets.on('connection', function (socket) {
                         topic_id:new ObjectID(data.topicId)
                 }, {w:-1}, function(err, document) {
                     // Update client.
-                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby});
-                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby});
+                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
+                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
                 });
             });
     	});

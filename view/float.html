@@ -27,6 +27,9 @@
                 $("#btnDislike" + data.ideaId).html("<i class='icon-thumbs-down'></i> " + data.dislike);
             });
             socket.on('serverUpdateAddIdea', function(data) {
+                if(data.topicId != "<%= topicId %>") {
+                    return;
+                }
                 $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0', createby:data.createby}).prependTo("#boxIdea");
                 $('.float').jqFloat({speed: 5000});
