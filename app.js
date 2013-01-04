@@ -13,7 +13,6 @@ var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
-var ObjectID = mongodb.ObjectID;
 var limit = 10;
 
 // =============== Web App Global Var 
@@ -30,13 +29,9 @@ app.set('views', __dirname + '/view'); // Set view dir.
 app.set('view engine', 'html'); // Set view extension.
 app.use(express.static(__dirname + '/resource/js')); // Import all static file in /resource/js.
 app.use(express.static(__dirname + '/floatmang_design/assets'));
-//app.use(express.static(__dirname + '/floatmang_design/assets/css'));
-//app.use(express.static(__dirname + '/floatmang_design/assets/img'));
-//app.use(express.static(__dirname + '/floatmang_design/assets/js'));
-//app.use(express.static(__dirname + '/floatmang_design/assets/font'));
 app.use(express.bodyParser()); // Enable req.body.PARAMETER.
-app.use(express.cookieParser()); // Enable session.
-app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
+app.use(express.cookieParser()); // Enable session/cookie.
+//app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
 
 // =============== Web App Route
 app.get('/', function(req, res) {
@@ -53,22 +48,26 @@ app.get('/login', function(req, res) {
     res.render('login');
 });
 app.post('/login', function(req, res) {  
-    // Create session 'name'.
-    req.session.name = 'anonymous';
+    // Create cookie 'name'.
+    res.cookie('name', 'anonymous');
     // If not an anonymous.
     if(!req.body.anonymous) { 
-        // Get post parameter 'name' and set session.
-        req.session.name = req.body.name; 
+        // Get post parameter 'name' and set cookie.
+        res.cookie('name', req.body.name);
     }
     res.redirect('topic');
 });
 
 app.get('/logout', function(req, res) {
-    req.session.destroy();
+    res.clearCookie('name');
     res.redirect('login');
 });
 
 app.get('/topic', function(req, res) {
+    if(req.cookies.name) {
+        console.log(">>> " + req.cookies.name);
+    }
+    
     if(loggedIn(req)) {
         // Display topic.
         mongoClient.connect(dbUrl, function(err, db) { 
@@ -88,7 +87,7 @@ app.get('/topic', function(req, res) {
                             appHost:appHost,
                             appPort:appPort,
                             limit:limit,
-                            name:req.session.name
+                            name:req.cookies.name
                         });
                     });
                 });
@@ -120,7 +119,7 @@ app.get('/idea', function(req, res) {
                                     appHost:appHost,
                                     appPort:appPort,
                                     limit:limit,
-                                    name:req.session.name
+                                    name:req.cookies.name
                                 });
                             }); 
 
@@ -155,7 +154,7 @@ app.get('/float', function(req, res) {
                                     appHost:appHost,
                                     appPort:appPort,
                                     limit:5,
-                                    name:req.session.name
+                                    name:req.cookies.name
                                 });
                             }); 
 
@@ -335,7 +334,7 @@ io.sockets.on('connection', function (socket) {
  * If user login already, return true.
  */
 function loggedIn(req) {
-    if(req.session.name) {
+    if(req.cookies.name) {
         return true;
     }
     return false;
