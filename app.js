@@ -7,7 +7,7 @@ var humane = require('./lib/humane');
 // =============== Config
 var appHost = '127.0.0.1';
 var appPort = 8888;
-var dbHost = '192.168.51.102';
+var dbHost = '127.0.0.1';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
@@ -64,10 +64,6 @@ app.get('/logout', function(req, res) {
 });
 
 app.get('/topic', function(req, res) {
-    if(req.cookies.name) {
-        console.log(">>> " + req.cookies.name);
-    }
-    
     if(loggedIn(req)) {
         // Display topic.
         mongoClient.connect(dbUrl, function(err, db) { 
@@ -301,6 +297,8 @@ io.sockets.on('connection', function (socket) {
                     // Update client.
                     socket.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic, createtime:document[0].createtime, createby:document[0].createby, prettytime:document[0].prettytime});
                     socket.broadcast.emit('serverUpdateAddTopic', {topicId:document[0]._id, topic:data.topic, createtime:document[0].createtime, createby:document[0].createby, prettytime:document[0].prettytime});
+                    // Update myself. Clear textbox in my browser only.
+                    socket.emit('serverUpdateAddTopicMe');
                 });
             });
         });
@@ -322,6 +320,8 @@ io.sockets.on('connection', function (socket) {
                     // Update client.
                     socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
                     socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
+                    // Update myself. Clear textbox in my browser only.
+                    socket.emit('serverUpdateAddIdeaMe');
                 });
             });
     	});

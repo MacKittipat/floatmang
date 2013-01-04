@@ -27,10 +27,10 @@
                 $("#btnDislike" + data.ideaId).html("<i class='icon-thumbs-down'></i> " + data.dislike);
             });
             socket.on('serverUpdateAddIdea', function(data) {
+                // Avoid other people add idea to other topic.
                 if(data.topicId != "<%= topicId %>") {
                     return;
                 }
-                $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0', createby:data.createby}).prependTo("#boxIdea");
                 $('.float').jqFloat({speed: 5000});
                  // Remove last idea after add new one.
@@ -39,6 +39,9 @@
                  } else { // Add totalDisplayIdea if total idea < limit
                      $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
                  }               
+            });
+            socket.on('serverUpdateAddIdeaMe', function(data) {
+                $("#frmAddIdea #addIdea").val("");
             });
             socket.on('serverUpdateEditIdea', function(data) {
                 $("#idea" + data.ideaId).html(data.idea); 

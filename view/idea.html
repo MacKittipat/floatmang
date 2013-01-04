@@ -28,7 +28,6 @@
                 if(data.topicId != "<%= topicId %>") {
                     return;
                 }
-                $("#frmAddIdea #addIdea").val("");
             	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0'}).prependTo("#boxIdea");
                  // Remove last idea after add new one.
                  if($(".rowIdea").size() > <%= limit %>) {
@@ -36,6 +35,9 @@
                  } else { // Add totalDisplayIdea if total idea < limit
                      $("#totalDisplayIdea").val(parseInt($("#totalDisplayIdea").val()) + 1);
                  }               
+            });
+            socket.on('serverUpdateAddIdeaMe', function(data) {
+                $("#frmAddIdea #addIdea").val("");
             });
             socket.on('serverUpdateEditIdea', function(data) {
                 $("#idea" + data.ideaId).html(data.idea); 

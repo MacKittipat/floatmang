@@ -18,8 +18,7 @@
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect();
-            socket.on('serverUpdateAddTopic', function(data) {
-                $("#frmAddTopic #addTopic").val("");
+            socket.on('serverUpdateAddTopic', function(data) {                
                 $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic, createtime:data.createtime, createby:data.createby, prettytime:data.prettytime}).prependTo("#boxTopic");
                 $('.tooltips').tooltip();
                  // Remove last topic after add new one.
@@ -28,6 +27,9 @@
                  } else { // Add totalDisplayTopic if total topic < limit
                      $("#totalDisplayTopic").val(parseInt($("#totalDisplayTopic").val()) + 1);
                  }                
+            });
+            socket.on('serverUpdateAddTopicMe', function(data) {
+                $("#frmAddTopic #addTopic").val("");
             });
             socket.on('serverUpdateEditTopic', function(data) {
                 $("#topic" + data.topicId).html(data.topic); 
