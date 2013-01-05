@@ -3,17 +3,21 @@ var ejs = require('ejs');
 var socketio = require('socket.io');
 var mongodb = require('mongodb');
 var humane = require('./lib/humane');
+var passport = require('passport');
 
 // =============== Config
-var appHost = '127.0.0.1';
+var appHost = 'localhost';
 var appPort = 8888;
-var dbHost = '127.0.0.1';
+var dbHost = 'localhost';
 var dbPort = 27017;
 var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
 var limit = 10;
+var fbAppId = "145982255474152";
+var fbAppSecret = "7c9dbcb785a465357017d9177faf6b48";
+var fbCallbackUrl = 'http://' + appHost + ':' + appPort + '/fb/auth/callback'
 
 // =============== Web App Global Var 
 var app = express();
@@ -22,6 +26,7 @@ var io = socketio.listen(listen);
 var mongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
 var BSON = require('mongodb').BSONPure;
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 // =============== Web App Config
 app.engine('html', ejs.__express); // Use ejs template engine.
@@ -31,7 +36,30 @@ app.use(express.static(__dirname + '/resource/js')); // Import all static file i
 app.use(express.static(__dirname + '/floatmang_design/assets'));
 app.use(express.bodyParser()); // Enable req.body.PARAMETER.
 app.use(express.cookieParser()); // Enable session/cookie.
-//app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
+app.use(express.session({secret: "MySessionSecret", key: 'MySessionKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// =============== FB passport
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use(new FacebookStrategy({
+    clientID: fbAppId,
+    clientSecret: fbAppSecret,
+    callbackURL: fbCallbackUrl
+}, 
+function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+        return done(null, profile);
+    });
+}));
 
 // =============== Web App Route
 app.get('/', function(req, res) {
@@ -58,7 +86,20 @@ app.post('/login', function(req, res) {
     res.redirect('topic');
 });
 
+app.get('/fb/login', passport.authenticate('facebook'), 
+    function(req, res){
+    });
+
+app.get('/fb/auth/callback', passport.authenticate('facebook'), 
+    function(req, res) {
+        console.log("[DEBUG] FB login : " + req.user.id + " | " + req.user.displayName);
+        // Create cookie 'name'.
+        res.cookie('name', req.user.displayName);
+        res.redirect('/topic');
+    });
+
 app.get('/logout', function(req, res) {
+    req.logout();
     res.clearCookie('name');
     res.redirect('login');
 });
