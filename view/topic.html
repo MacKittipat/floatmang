@@ -19,7 +19,7 @@
         <script type="text/javascript">
             var socket = io.connect();
             socket.on('serverUpdateAddTopic', function(data) {                
-                $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic, createtime:data.createtime, createby:data.createby, prettytime:data.prettytime}).prependTo("#boxTopic");
+                $("#topicTemplate").tmpl({topicId:data.topicId, topic:data.topic, createtime:data.createtime, createby:data.createby, prettytime:data.prettytime, count_idea:'0'}).prependTo("#boxTopic");
                 $('.tooltips').tooltip();
                  // Remove last topic after add new one.
                  if($(".rowTopic").size() > <%= limit %>) {
