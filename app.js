@@ -15,7 +15,7 @@ var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
-var limit = 10;
+var limit = 2;
 var fbAppId = "145982255474152";
 var fbAppSecret = "7c9dbcb785a465357017d9177faf6b48";
 var fbCallbackUrl = 'http://' + appHost + ':' + appPort + '/fb/auth/callback'
@@ -173,7 +173,11 @@ app.get('/idea', function(req, res) {
                 // Find idea by topic id.
                var cursorIdea = collection.find({topic_id:new ObjectID(req.query.id)}, {sort:{like:-1, createtime:-1}, skip:0, limit:limit}); 
                cursorIdea.toArray(function(err, documents) {
-                   // Count all idea.
+                    // Extend document field.
+                    for(var key in documents) {
+                        documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
+                    }
+                    // Count all idea.
                     collection.find().count(function(err, count) { 
                         // Find topic by topicId.
                         db.collection(tbTopic, function(err, collection) {
@@ -279,6 +283,10 @@ app.post('/a/moreidea', function(req, res) {
             // Find idea by topic id.
             var cursorIdea = collection.find({topic_id:new ObjectID(req.body.topicId)}, {sort:{like:-1, createtime:-1}, skip:req.body.totalDisplayIdea, limit:limit}); 
             cursorIdea.toArray(function(err, documents) { 
+                // Extend document field.
+                for(var key in documents) {
+                    documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
+                }     
                 // Return idea as JSON. 
                 res.json(documents);   
             });
@@ -409,9 +417,11 @@ io.sockets.on('connection', function (socket) {
                         dislike:0,
                         topic_id:new ObjectID(data.topicId)
                 }, {w:-1}, function(err, document) {
+                    // Extend document field.
+                    document[0].prettytime = humane.humaneDate(new Date(document[0].createtime));
                     // Update client.
-                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
-                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id});
+                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime});
+                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime});
                     // Update myself. Clear textbox in my browser only.
                     socket.emit('serverUpdateAddIdeaMe');
                 });
