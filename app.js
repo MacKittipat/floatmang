@@ -4,6 +4,7 @@ var socketio = require('socket.io');
 var mongodb = require('mongodb');
 var humane = require('./lib/humane');
 var passport = require('passport');
+var async = require('async');
 
 // =============== Config
 var appHost = 'localhost';
@@ -14,7 +15,7 @@ var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
-var limit = 10;
+var limit = 2;
 var fbAppId = "145982255474152";
 var fbAppSecret = "7c9dbcb785a465357017d9177faf6b48";
 var fbCallbackUrl = 'http://' + appHost + ':' + appPort + '/fb/auth/callback'
@@ -116,17 +117,46 @@ app.get('/topic', function(req, res) {
                     for(var key in documents) {
                         documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
                     }
-                    // Count all topic.
-                    collection.find().count(function(err, count) { 
-                        res.render('topic', {
-                            documents:documents,
-                            totalTopic:count,
-                            appHost:appHost,
-                            appPort:appPort,
-                            limit:limit,
-                            name:req.cookies.name
+                    if(documents==0) {
+                        collection.find().count(function(err, count) { 
+                            res.render('topic', {
+                                documents:documents,
+                                totalTopic:count,
+                                appHost:appHost,
+                                appPort:appPort,
+                                limit:limit,
+                                name:req.cookies.name
+                            });
                         });
-                    });
+                    } else {
+                        var documentIndex = 0;
+                        async.map(documents, function(item) {
+                            mongoClient.connect(dbUrl, function(err, db) { 
+                                db.collection(tbIdea, function(err, collectionIdea) {
+                                    collectionIdea.find({
+                                        topic_id:item._id
+                                    }).count(function(err, count) { 
+                                        // Extend count idea field and render view if it is a last index of document.
+                                        item.count_idea = count;
+                                        if(documentIndex == documents.length-1) {
+                                            // Count all topic.
+                                            collection.find().count(function(err, count) { 
+                                                res.render('topic', {
+                                                    documents:documents,
+                                                    totalTopic:count,
+                                                    appHost:appHost,
+                                                    appPort:appPort,
+                                                    limit:limit,
+                                                    name:req.cookies.name
+                                                });
+                                            });
+                                        }
+                                        documentIndex++;
+                                    });
+                                });
+                            });
+                        }, function(err, result) {});
+                    }
                 });
             });
         });
@@ -214,9 +244,30 @@ app.post('/a/moretopic', function(req, res) {
                 // Extend document field.
                 for(var key in documents) {
                     documents[key].prettytime = humane.humaneDate(new Date(documents[key].createtime));
-                }
-                // Return topic as JSON. 
-                res.json(documents);   
+                }                
+                if(documents==0) {
+                    // Return topic as JSON. 
+                    res.json(documents);  
+                } else {
+                    var documentIndex = 0;
+                    async.map(documents, function(item) {
+                        mongoClient.connect(dbUrl, function(err, db) { 
+                            db.collection(tbIdea, function(err, collectionIdea) {
+                                collectionIdea.find({
+                                    topic_id:item._id
+                                }).count(function(err, count) { 
+                                    // Extend count idea field and render view if it is a last index of document.
+                                    item.count_idea = count;
+                                    if(documentIndex == documents.length-1) {
+                                        // Return topic as JSON. 
+                                        res.json(documents);  
+                                    }
+                                    documentIndex++;
+                                });
+                            });
+                        });
+                    }, function(err, result) {});
+                }                                               
             });
         });
     });
@@ -259,7 +310,7 @@ app.post('/a/getidea', function(req, res) {
     });
 });
 
-console.log('App is running : http://localhost:' + appPort);
+console.log('App is running : http://' + appHost + ':' + appPort);
 
 // =============== Socket.IO
 io.sockets.on('connection', function (socket) {
