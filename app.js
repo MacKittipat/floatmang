@@ -15,7 +15,7 @@ var dbName = "floatmang";
 var dbUrl = "mongodb://" + dbHost + ":" + dbPort + "/" + dbName;
 var tbTopic = "topic";
 var tbIdea = "idea";
-var limit = 2;
+var limit = 3;
 var fbAppId = "145982255474152";
 var fbAppSecret = "7c9dbcb785a465357017d9177faf6b48";
 var fbCallbackUrl = 'http://' + appHost + ':' + appPort + '/fb/auth/callback'
@@ -96,6 +96,7 @@ app.get('/fb/auth/callback', passport.authenticate('facebook'),
         console.log("[DEBUG] FB login : " + req.user.id + " | " + req.user.displayName);
         // Create cookie 'name'.
         res.cookie('name', req.user.displayName);
+        res.cookie('fb_user_id', req.user.id);
         res.redirect('/topic');
     });
 
@@ -190,7 +191,8 @@ app.get('/idea', function(req, res) {
                                     appHost:appHost,
                                     appPort:appPort,
                                     limit:limit,
-                                    name:req.cookies.name
+                                    name:req.cookies.name,
+                                    fb_user_id:req.cookies.fb_user_id
                                 });
                             }); 
 
@@ -225,7 +227,8 @@ app.get('/float', function(req, res) {
                                     appHost:appHost,
                                     appPort:appPort,
                                     limit:5,
-                                    name:req.cookies.name
+                                    name:req.cookies.name,
+                                    fb_user_id:req.cookies.fb_user_id
                                 });
                             }); 
 
@@ -412,6 +415,7 @@ io.sockets.on('connection', function (socket) {
                 collection.insert({
                         idea:data.idea,
                         createby:data.name,
+                        fb_user_id:data.fb_user_id,
                         createtime:new Date().getTime(),
                         like:0,
                         dislike:0,
@@ -420,8 +424,8 @@ io.sockets.on('connection', function (socket) {
                     // Extend document field.
                     document[0].prettytime = humane.humaneDate(new Date(document[0].createtime));
                     // Update client.
-                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime});
-                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime});
+                    socket.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime, fb_user_id:document[0].fb_user_id});
+                    socket.broadcast.emit('serverUpdateAddIdea', {ideaId: document[0]._id, idea: data.idea, createby:document[0].createby, topicId:document[0].topic_id, prettytime:document[0].prettytime, fb_user_id:document[0].fb_user_id});
                     // Update myself. Clear textbox in my browser only.
                     socket.emit('serverUpdateAddIdeaMe');
                 });

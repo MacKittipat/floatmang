@@ -32,7 +32,7 @@
                 if(data.topicId != "<%= topicId %>") {
                     return;
                 }
-            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0', prettytime:data.prettytime, createby:data.createby}).prependTo("#boxIdea");
+            	$("#ideaTemplate").tmpl({ideaId:data.ideaId, idea:data.idea, like:'0', dislike:'0', prettytime:data.prettytime, createby:data.createby, fb_user_id:data.fb_user_id}).prependTo("#boxIdea");
                  // Remove last idea after add new one.
                  if($(".rowIdea").size() > <%= limit %>) {
                     $("#boxIdea .rowIdea:last").remove();
@@ -70,7 +70,7 @@
                     var totalDisplayIdea = parseInt($("#totalDisplayIdea").val());
                     $.post('/a/moreidea', {topicId:'<%= topicId %>', totalDisplayIdea:totalDisplayIdea}, function(data) {
                         for(var key in data) {
-                            $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike, prettytime:data[key].prettytime, createby:data[key].createby}).appendTo("#boxIdea");
+                            $("#ideaTemplate").tmpl({ideaId:data[key]._id, idea:data[key].idea, like:data[key].like, dislike:data[key].dislike, prettytime:data[key].prettytime, createby:data[key].createby, fb_user_id:data[key].fb_user_id}).appendTo("#boxIdea");
                         }
                         $("#totalDisplayIdea").val(totalDisplayIdea + data.length);
                     }, 'json');
@@ -79,13 +79,15 @@
                     var topicId = $.trim($("#frmAddIdea #topicId").val());
                     var name = $.trim($("#frmAddIdea #name").val());
                     var idea = $.trim($("#frmAddIdea #addIdea").val());
+                    var fb_user_id = $.trim($("#frmAddIdea #fb_user_id").val());
                     if(!topicId || !name || !idea) {
                         return;
                     }
                     socket.emit('clientAddIdea', {
                         topicId: topicId, 
                         name:name,
-                        idea: idea
+                        idea: idea,
+                        fb_user_id:fb_user_id
                     }); 
                     $('#myModal').modal('hide')
                 });
@@ -158,6 +160,7 @@
                             <div class="modal-body">
                                 <input type="hidden" id="topicId" name="topicId" value='<%= topicId %>' />
                                 <input type="hidden" id="name" value="<%= name %>" />
+                                <input type="hidden" id="fb_user_id" value="<%= fb_user_id %>" />
                                 <input class="input-block-level" type="text" id="addIdea" placeholder="Type your idea here">
                             </div>
                             <div class="modal-footer">
@@ -177,6 +180,9 @@
                         <div class="span7" id="idea<%= documents[key]._id  %>">
                             <h5><%= documents[key].idea  %></h5>
                             <span class="ideacreateby">
+                                <% if(documents[key].fb_user_id != 'undefined') { %>
+                                <img src="http://graph.facebook.com/<%= documents[key].fb_user_id %>/picture" />                       
+                                <% } %>
                                 <%= documents[key].createby %>
                                 (<%= documents[key].prettytime %>)
                             </span>
@@ -196,6 +202,9 @@
                             <div class="span7" id="idea${ideaId}">
                                 <h5>${idea}</h5>
                                 <span class="ideacreateby">
+                                    {{if fb_user_id != 'undefined' }}
+                                    <img src="http://graph.facebook.com/${fb_user_id}/picture" />                       
+                                    {{/if}}
                                     ${createby}
                                     (${prettytime})
                                 </span>
